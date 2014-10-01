@@ -15,6 +15,7 @@ int main(int argc, char** argv)
        return 2;
    }
 
+   nct->modemDevice = malloc(sizeof(char) * strlen(argv[1]) );
    if (nct == NULL)
    {
        printf("Error in malloc of noncanon_t type.\nEnding program.");
