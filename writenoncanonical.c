@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define BAUDRATE B38400
+#define BAUDRATE B9600
 #define MODEMDEVICE "/dev/ttyS1"
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 #define FALSE 0
@@ -47,15 +47,6 @@ int main(int argc, char** argv)
       perror("tcgetattr");
       exit(-1);
     }
-
-
-
-	char frase[255];
-    printf("Introduza uma string: ");
-    gets(frase);
-
-	if (frase[strlen(frase) - 1] == '\n')
-		frase[strlen(frase) - 1] = '\0';
   
   
 	//printf("No. caracteres: %d\n", strlen(frase));
@@ -82,6 +73,13 @@ int main(int argc, char** argv)
       exit(-1);
     }
 
+    
+    char frase[255];
+    printf("Introduza uma string: ");
+    gets(frase);
+
+frase[5] = '\n';
+ 
     printf("\nNew termios structure set\n\n");
 
     res = write(fd,frase,strlen(frase));  

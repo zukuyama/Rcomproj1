@@ -10,7 +10,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#define BAUDRATE B38400
+#define BAUDRATE B9600
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 #define FALSE 0
 #define TRUE 1
@@ -74,17 +74,22 @@ int main(int argc, char** argv)
     printf("New termios structure set\n");
 
 	//strcpy(buf, "\0");
+    
     while (STOP==FALSE)
     {       
       /* loop for input */
       res = read(fd,buf,255);   /* returns after 5 chars have been input */
-      buf[res]='\0';               /* so we can printf... */
+      buf[res]='\0';
+      
+               /* so we can printf... */
+      
       printf("-- buffer --\nstring: %s\nlength: %d\n\n", buf, res);
       
       if (buf[0]=='z')
 	STOP=TRUE;
       
-      strcpy(buf, "\0");
+   
+	strcpy(buf, "\0");
     }
 
 
