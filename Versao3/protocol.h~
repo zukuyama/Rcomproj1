@@ -1,6 +1,8 @@
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
 
+#include "include.h"
+
 #define F 0x7e
 #define A 0x03
 #define C 0x03
@@ -14,6 +16,5 @@ typedef struct supervision_t
 } super_t;
 
 void init_super(super_t * s);
-void reset_super(super_t * s);
 
 #endif

@@ -1,16 +1,7 @@
 #ifndef   NONCANON_H
 #define   NONCANON_H
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <termios.h>
-#include <stdio.h>
-
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-
+#include "include.h"
 #include "protocol.h"
 
 #define BAUDRATE B9600
@@ -23,9 +14,10 @@ typedef struct noncanon_type
    int fd;
    struct termios oldtio;
    struct termios newtio;
-   char deviceName[10];
+   unsigned char string[255];
+   char device[10];
    
-   super_t * s;
+   super_t s;
    
 } noncanon_t;
 

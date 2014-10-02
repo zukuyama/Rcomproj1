@@ -3,26 +3,20 @@
 volatile int STOP=FALSE;
 
 void init_noncanon(noncanon_t * nct)
-{
-   nct = (noncanon_t *) malloc( sizeof(noncanon_t) );
-
-   if (nct == NULL)
-   {
-       perror("Error in malloc of noncanon_t type.\nEnding program.");
-       exit(1);
-   }
+{  
+   init_super(&(nct->s));
 }
 
 int open_noncanon(noncanon_t * nct)
 {
-   // open serial port device for reading and writing and not as controlling tty because we don't want to get killed if linenoise sends CTRL-C.
-   nct->fd = open(nct->deviceName, O_RDWR | O_NOCTTY );
+   // open serial port device for reading and writing and not as controlling tty because we don't want to get killed if linenoise sends CTRL-C.      
+   nct->fd = open(nct->device, O_RDWR | O_NOCTTY );
    if (nct->fd < 0)
    {
-      perror(nct->deviceName);
+      perror(nct->device);
       exit(-1);
    }
-
+   
    // save current port settings
    if ( tcgetattr(nct->fd, &(nct->oldtio)) == -1 )
    {
@@ -48,7 +42,7 @@ int open_noncanon(noncanon_t * nct)
 
    tcflush(nct->fd, TCIOFLUSH);
 
-   printf("\nNew termios structure set.\nCommunication to '%s' is open.",nct->deviceName);
+   printf("\nNew termios structure set.\nCommunication to '%s' is open.", nct->device);
 
    return 0;
 }
@@ -62,7 +56,7 @@ int close_noncanon(noncanon_t * nct)
       exit(-1);
    }
 
-   printf("\nTermios structure reset.\nCommunication to '%s' is closed.",nct->deviceName);
+   printf("\nTermios structure reset.\nCommunication to '%s' is closed.", nct->device);
 
    close(nct->fd);
 
@@ -73,10 +67,10 @@ int send_noncanon(noncanon_t * nct)
 {
    int res;
 
-   res = write(nct->fd, nct->s->set, 5 * sizeof(Byte));
+   res = write(nct->fd, nct->s.set, 5 * sizeof(Byte));
    sleep(3);
 
-   printf("Sent %d bytes\n", res);
+   printf("\nSent %d bytes.", res);
 
    return 0;
 }
@@ -109,17 +103,4 @@ int receive_noncanon(noncanon_t * nct)
     printf("Received message: \"%s\" -> (size = %d)\n\n", nct->string, (int) strlen((char *)nct->string));
 
     return 0;
-}
-
-void free_noncanon(noncanon_t * nct)
-{
-   if (nct != NULL)
-   {
-      if (nct->deviceName != NULL)
-      {
-         free(nct->deviceName);
-      }
-
-      free(nct);
-   }
 }
