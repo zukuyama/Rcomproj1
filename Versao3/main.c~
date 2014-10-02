@@ -20,7 +20,7 @@ int main(int argc, char** argv)
    open_noncanon(nct);
 
    // envio/leitura , usar exemplos abaixo
-   // send_noncanon(nct);
+   send_noncanon(nct);
    // receive_noncanon(nct);
 
    close_noncanon(nct);

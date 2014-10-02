@@ -23,7 +23,6 @@ typedef struct noncanon_type
    int fd;
    struct termios oldtio;
    struct termios newtio;
-   unsigned char string[255];
    char deviceName[10];
    
    super_t * s;

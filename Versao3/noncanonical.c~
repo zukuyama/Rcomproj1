@@ -106,7 +106,7 @@ int receive_noncanon(noncanon_t * nct)
       }
       
     }
-    printf("Received message: \"%s\" -> (size = %d)\n\n", nct->string, (int) strlen((char *)nct->string));
+    printf("Received message: \"%s\" -> (size = %d)\n\n", nct->string, strlen((char *)nct->string));
 
     return 0;
 }
