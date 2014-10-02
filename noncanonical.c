@@ -1,7 +1,9 @@
 /*Non-Canonical Input Processing*/
 // in server xDD
 
-
+/***********************************
+*		Aula 1 : 25 Setembro 2014
+***********************************/
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -17,10 +19,19 @@
 #define FALSE 0
 #define TRUE 1
 
+/***********************************
+*		Aula 2 : 2 Outubro 2014
+***********************************/
+#include "protocol.h"
+
+/***********************************
+*		Aula 1 : 25 Setembro 2014
+***********************************/
 volatile int STOP=FALSE;
 
 int main(int argc, char** argv)
 {
+	system("clear");
     int fd,c, res;
     struct termios oldtio,newtio;
     char buf[255];
@@ -61,7 +72,7 @@ int main(int argc, char** argv)
 // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&& tcgetattr &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
   /* 
     VTIME e VMIN devem ser alterados de forma a proteger com um temporizador a 
-    leitura do(s) próximo(s) caracter(es)
+    leitura do(s) prÃ³ximo(s) caracter(es)
   */
 
 
