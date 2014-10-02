@@ -1,0 +1,14 @@
+na 1ª vez que crias a pasta fazes:
+	git clone "link_dado_nogithub"
+
+
+antes de comecar a trabalhar:
+	Estudar pa caralho, e depois fazes isto, para sincronizar com a versao mais recente :
+		"git pull"
+
+Para gravar as alteracoes que fizeste(so gravar alteracoes que FUNCIONEM):
+				git add "nomeficheiroa adicionar"
+				git commit -m "mensagem para os outros coleguinhas"
+				git push 
+
+
