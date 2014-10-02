@@ -12,6 +12,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "protocol.h"
+
 #define BAUDRATE B9600
 #define MODEMDEVICE "/dev/ttyS1"
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
@@ -23,9 +25,11 @@ volatile int STOP=FALSE;//is a qualifier that is applied to a variable when it i
 
 int main(int argc, char** argv)
 {
+    
+
     int fd,c, res;
     struct termios oldtio,newtio;
-    char buf[255];
+    unsigned char buf[255];
     int i, sum = 0, speed = 0;
     
     if ( (argc < 2) || 
@@ -80,31 +84,65 @@ int main(int argc, char** argv)
 // &&&&&&&&&&&&&&&&&&&&&&&&&&&&      SEND     &&&&&&&&&&&&&&&&&&&&&&&&&&&&
 // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     printf("..:: New termios structure set ::..\n");
-    printf("Message to send: ");
-    gets(buf);
+    //printf("Message to send: ");
+    //gets(buf);
    
-    res = write(fd,buf,255);   
-    printf("%d bytes written\n\n", res);
- 
+    
+
+    //res = write(fd,buf,255);   
+    //printf("%d bytes written\n\n", res);
+	 
+
 // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 // &&&&&&&&&&&&&&&&&&&&&&&&&&&&     receive    &&&&&&&&&&&&&&&&&&&&&&&&&&&
 // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-   printf("..:: New termios structure set ::..\n");
+  
+ /*printf("..:: New termios structure set ::..\n");
    printf("Waiting for message...\n");
 
-    char frase[255] = '\0';
-    while (STOP==FALSE) {       /* loop for input */
-      res = read(fd,buf,255);   /* returns after 5 chars have been input */
+    unsigned char frase[255];
+    frase[0] = '\0';
+    while (STOP==FALSE) {       
+      res = read(fd,buf,255);   
       
       if (buf[0]=='z' || buf[res-1]=='\0') STOP=TRUE;// '\0' recebeu o fim da string
-      buf[res]='\0';               /* so we can printf... */
+      buf[res]='\0';              
             
 
       strcat(frase,buf);             
       
       printf("packet received: \"%s\" -> (size = %d)\n", buf, res);
     }
-    printf("Message received: \"%s\" -> (size = %d)\n\n", frase, strlen(frase));
+    printf("Message received: \"%s\" -> (size = %d)\n\n", frase, (int) strlen(frase));
+	*/
+	
+	//printf("Message to send: ");
+    //gets(buf);
+   
+    
+
+    //res = write(fd,buf,255);   
+    //printf("%d bytes written\n\n", res);
+
+
+    Byte set[5];
+    Byte ua[5];
+    
+    set[0] = F;
+	set[1] = A;
+	set[2] = C;
+	set[3] = set[1]^set[2];
+	set[4] = F;
+
+	ua[0] = set[0];
+	ua[1] = set[1];
+	ua[2] = set[2];
+	ua[3] = set[3];
+	ua[4] = set[4];
+
+     res = write(fd,set,5);
+	
+sleep (3);
 
     // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     
