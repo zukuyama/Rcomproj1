@@ -110,6 +110,7 @@ int main(int argc, char** argv)
     
     printf("Resending Message...\n");
    
+	write(fd, set, 5);
     res = write(fd,frase,255);   
     printf("%d bytes written\n", res);
  
