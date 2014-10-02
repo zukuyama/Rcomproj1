@@ -32,9 +32,12 @@ volatile int STOP=FALSE;
 int main(int argc, char** argv)
 {
 	system("clear");
+
+	resetGates();
+
     int fd,c, res;
     struct termios oldtio,newtio;
-    char buf[255];
+    unsigned char buf[255];
 
     if ( (argc < 2) || 
   	     ((strcmp("/dev/ttyS0", argv[1])!=0) && 
@@ -88,19 +91,32 @@ int main(int argc, char** argv)
     printf("..:: New termios structure set ::..\n");
     printf("Waiting for message...\n");
 
-    char frase[255] = "\0";
-    while (STOP==FALSE) {       /* loop for input */
-      res = read(fd,buf,255);   /* returns after 5 chars have been input */
+	//res = read(fd, buf, 5 * sizeof(unsigned char));
+	//write(STDOUT_FILENO, buf, sizeof(unsigned char) * 5);	
+
+   unsigned char frase[255] = "\0";
+    while (STOP==FALSE)
+{       /* loop for input */
+      
+	res = read(fd,buf,255);   /* returns after 5 chars have been input */
       
       if (buf[0]=='z' || buf[res-1]=='\0') STOP=TRUE;// '\0' recebeu o fim da string
       buf[res]='\0';               /* so we can printf... */
             
 
       strcat(frase,buf);             
-      
-      printf("packet received: \"%s\" -> (size = %d)\n", buf, res);
+      //printf("packet received: \"%s\" -> (size = %d)\n", buf, res);
+
+int x = 0;
+      while(x < 5){
+         
+printf("%d -> [%x]  ", x,buf[x]);
+         x++;
+      }
+printf("\n");
     }
     printf("Message received: \"%s\" -> (size = %d)\n\n", frase, strlen(frase));
+	
 
 // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 // &&&&&&&&&&&&&&&&&&&&&&&&&&&&      SEND     &&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -110,8 +126,8 @@ int main(int argc, char** argv)
     
     printf("Resending Message...\n");
    
-	write(fd, set, 5);
-    res = write(fd,frase,255);   
+	//write(fd, set, 5);
+    res = write(fd,frase, 255);   
     printf("%d bytes written\n", res);
  
 // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&& tcsetattr &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
