@@ -1,0 +1,5 @@
+in order to check whether 2 pcs are communicating type in both of them:
+
+"gtkterm -p/dev/ttySX"
+
+being X the value associated with each computer
