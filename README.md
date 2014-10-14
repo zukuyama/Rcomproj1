@@ -14,7 +14,7 @@ client: ttyS0
 
     run terminal
         $ gcc -c r.c -o r
-        $ ./s /dev/ttyS0/ 
+        $ ./r /dev/ttyS0/ 
 
 
   ModularBranch of Lab2
@@ -27,7 +27,7 @@ client: ttyS4
     save main.c
     run terminal
         $ gcc -c main.c -o main
-        $ ./s /dev/ttyS4/
+        $ ./main /dev/ttyS4/
     
 client: ttyS0
 
@@ -36,4 +36,4 @@ client: ttyS0
     save main.c
     run terminal
         $ gcc -c main.c -o main
-        $ ./s /dev/ttyS0/
+        $ ./main /dev/ttyS0/
