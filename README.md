@@ -3,7 +3,7 @@ Rcomproj1
 
 
 ==================
-  Current
+  Current Lab2
 ==================
 
 client: ttyS4
