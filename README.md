@@ -8,15 +8,15 @@ Rcomproj1
 
 client: ttyS4
 
-  run terminal
-  use:
-    gcc -c s.c -o s
-    
+    run terminal
+        $ gcc -c s.c -o s
+        $ ./s /dev/ttyS4/
+
 client: ttyS0
 
-  run terminal
-  use:
-    gcc -c r.c -o r
+    run terminal
+        $ gcc -c r.c -o r
+        $ ./s /dev/ttyS0/ 
 
 
 ==================
@@ -25,20 +25,18 @@ client: ttyS0
 
 client: ttyS4
 
-  open main.c
-  uncomment: //send_nc(port);
-  save main.c
-
-  run terminal
-  use:
-    gcc -c main.c -o main
+    open main.c
+    uncomment: //send_nc(port);
+    save main.c
+    run terminal
+        $ gcc -c main.c -o main
+        $ ./s /dev/ttyS4/
     
 client: ttyS0
 
-  open main.c
-  uncomment: //receive_nc(port);
-  save main.c
-
-  run terminal
-  use:
-    gcc -c main.c -o main
+    open main.c
+    uncomment: //receive_nc(port);
+    save main.c
+    run terminal
+        $ gcc -c main.c -o main
+        $ ./s /dev/ttyS0/
