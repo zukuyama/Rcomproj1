@@ -145,10 +145,14 @@ int main(int argc, char** argv)
 	
 	
 	int stateFase = 0;
-
+	printf("%d", stateFase);
     while (STOP==FALSE) {
+	printf("Reading: ");
+
       	read(fd,&Carc,1);
+printf("%d\n", stateFase);
 		switch(stateFase){
+
 			case 0:
 				if(Carc == F)
 					stateFase=1;
@@ -178,7 +182,7 @@ int main(int argc, char** argv)
 						stateFase = 0;
 				break;
 			case 4:
-				if(stateFase == F)
+				if(Carc == F)
 					STOP = TRUE;
 				else
 					stateFase = 0;
