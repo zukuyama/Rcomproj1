@@ -26,7 +26,7 @@ client: ttyS4
     uncomment: //send_nc(port);
     save main.c
     run terminal
-        $ gcc -c main.c -o main
+        $ gcc appLayer.c auxiliar.c linkLayer.c noncanon.c protocol.c main.c -o main
         $ ./main /dev/ttyS4/
     
 client: ttyS0
