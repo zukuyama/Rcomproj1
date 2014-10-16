@@ -8,7 +8,7 @@
 #include "include.h"
 #include "appLayer.h"
 
-static appLayer  app;
+static appLayer app;
 static linkLayer lnk;
 
 int main(int argc, const char * argv[])
@@ -40,6 +40,8 @@ int main(int argc, const char * argv[])
         device[9] = '4';
         deviceN   =  4;
     }
+    
+     deviceN   =  0;
     
     initLinkLayer(&lnk);
     initAppLayer(&app);

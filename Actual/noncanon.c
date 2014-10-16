@@ -41,6 +41,7 @@ int open_nc(int * fd, const char * port) // abre descriptor da port em modo O_NO
 void close_nc(int fd) // fecha descriptor
 {
     //return (fcntl(fd, F_GETFD) != -1 || errno != EBADF);
+    //sleep (3);
     close(fd);
 }
 
@@ -141,7 +142,7 @@ int read_UA(int * fd) // lê o UA
         if (res != 0)
         {
             aux1[i] = buf[0];
-            if (aux1[i] == F && i != 0)
+            if (aux1[i] == ua[4] && i != 0)
             {
                 STOP = TRUE;
 		 // estadoUA = TRUE;
@@ -162,6 +163,7 @@ int read_UA(int * fd) // lê o UA
         } 
         printf("\n");
     }
+    
     if(flag == 1)
     {
         //STOP = FALSE;
@@ -211,6 +213,7 @@ int send_nc(int fd)
     
     system("clear");
     
+    //set_newsettings_custom(fd, &oldtermios, &newtermios, 0.1, 0); 
     set_newsettings_custom(fd, &oldtermios, &newtermios, 0.1, 0); // atribui o descritor do ficheiro de serial port
     
     while ( tentativas < 3 )
@@ -253,20 +256,19 @@ int receive_nc(int fd)
     
     system("clear");
     
-    set_newsettings_custom(fd, &oldtermios, &newtermios, 0, 1); // atribui o descritor do ficheiro de serial port
+    //set_newsettings_custom(fd, &oldtermios, &newtermios, 0, 1); 
+    set_newsettings_custom(fd, &oldtermios, &newtermios, 0, 5); // atribui o descritor do ficheiro de serial port
     
     int phase=0;
+    unsigned int pos = 0;
     
     // receber set
     printf("Receiving SET...\n");
     while ( STOP==FALSE ) /* loop for input */
     {
-        res = read(fd,&buf,5);   /* returns after 5 chars have been input */
-	unsigned int pos = 0;
+        res = read(fd,&buf,1);   /* returns after 5 chars have been input */
 	
-	for(pos = 0; pos < 5 && STOP == FALSE; pos++)
-	{
-		unsigned char LETRA = buf[pos];		
+	unsigned char LETRA = buf[0];		
 	
 		switch(phase)
 		{
@@ -302,18 +304,15 @@ int receive_nc(int fd)
                		if (LETRA == set[4])
 			{
 				phase = 6;
+				STOP = TRUE;
 			}
                 	else
                     		{ phase=0; }
                 	break;
-        	}
+        	
 	}	
 	
-	printf("HEXACODES: ");
-        for (x = 0; x < 5; x++)
-        {
-            printf("0x%x ", buf[x] );
-        } printf("\n");
+	printf("HEXACODE: 0x%x\n", LETRA);
 
 	// chegou ao fim do maquina de estados
 	if (phase == 6) 

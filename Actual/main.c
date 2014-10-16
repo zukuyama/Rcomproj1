@@ -41,6 +41,7 @@ int main(int argc, const char * argv[])
         deviceN   =  4;
     }
     
+    
     initLinkLayer(&lnk);
     initAppLayer(&app);
     
