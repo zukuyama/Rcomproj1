@@ -20,23 +20,23 @@ client: ttyS0
   ModularBranch2 of Lab3
 ==================
 
-client: ttyS4
+on: ttyS4
 
     run terminal
         $ gcc appLayer.c auxiliar.c linkLayer.c noncanon.c protocol.c main.c -o main
-      se estiver a enviar  
-        $ ./main client 1
-      se estiver a receber
-        $ ./main client 0
+        -if sending 
+          $ ./main client 1
+        -if receiving
+          $ ./main client 0
     
-client: ttyS0
+on: ttyS0
 
-    open main.c
-    uncomment: //receive_nc(port);
-    save main.c
     run terminal
         $ gcc appLayer.c auxiliar.c linkLayer.c noncanon.c protocol.c main.c -o main
-        $ ./main /dev/ttyS0/
+        -if sending  
+          $ ./main server 1
+        -if receiving
+          $ ./main server 0
 
 
   ModularBranch of Lab2
