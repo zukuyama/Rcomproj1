@@ -1,21 +1,27 @@
 Rcomproj1
 ===========================
 
-  Current Lab2
+  Actual
 ==================
 
-client: ttyS4
+on: ttyS4
+    
+    run terminal
+      make
+      -if sending 
+        $ bin/main client send
+      -if receiving
+          $ bin/main client get
+    
+on: ttyS0
 
     run terminal
-        $ gcc -c s.c -o s
-        $ ./s /dev/ttyS4/
-
-client: ttyS0
-
-    run terminal
-        $ gcc -c r.c -o r
-        $ ./r /dev/ttyS0/ 
-
+      make
+      -if sending 
+        $ bin/main server send
+      -if receiving
+        $ bin/main server get
+          
 
   ModularBranch2 of Lab3
 ==================
