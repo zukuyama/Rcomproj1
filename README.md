@@ -17,6 +17,28 @@ client: ttyS0
         $ ./r /dev/ttyS0/ 
 
 
+  ModularBranch2 of Lab3
+==================
+
+client: ttyS4
+
+    run terminal
+        $ gcc appLayer.c auxiliar.c linkLayer.c noncanon.c protocol.c main.c -o main
+      se estiver a enviar  
+        $ ./main client 1
+      se estiver a receber
+        $ ./main client 0
+    
+client: ttyS0
+
+    open main.c
+    uncomment: //receive_nc(port);
+    save main.c
+    run terminal
+        $ gcc appLayer.c auxiliar.c linkLayer.c noncanon.c protocol.c main.c -o main
+        $ ./main /dev/ttyS0/
+
+
   ModularBranch of Lab2
 ==================
 
@@ -35,5 +57,5 @@ client: ttyS0
     uncomment: //receive_nc(port);
     save main.c
     run terminal
-        $ gcc -c main.c -o main
+        $ gcc appLayer.c auxiliar.c linkLayer.c noncanon.c protocol.c main.c -o main
         $ ./main /dev/ttyS0/
