@@ -55,6 +55,16 @@ int llopen(int porta, size_t flag)
     return fd;
 }
 
+/*void llwrite(int fd, char * buffer, int length) {
+
+	printf("Sending signal... ");
+	
+	tcflush(fd, TCOFLUSH); // Clean output buffer
+
+    write(*fd, msg, length);
+
+    printf("[OK]\n");
+}*/
 
 int llclose(int fd)
 {
