@@ -52,7 +52,7 @@ int llopen(int porta, size_t flag)
     return fd;
 }
 
-void llwrite(int fd, char * buffer, int length) {
+int llwrite(int fd, char * buffer, int length) {
 
 	printf("Sending signal... ");
 	
