@@ -48,22 +48,50 @@ int llopen(int porta, size_t flag)
     {
         receive_nc(fd);
     }
-    sleep(1); 
+    
     return fd;
 }
 
-void llwrite(int fd, char * buffer, int length) {
+int llwrite(int fd, char * buffer, int length) {
+        char FLAG = 0x7e;// need to define both
+        char ESC = 0x7d; 
+        int MFS = 200; 
+   
+        char C = 0x01;
+        // need to divide the buffer in n parts xD 
+        char N = 0;
+	char L2 = MFS % 256:
+        char L1 = MFS - L2 * 256;
+        
+        char newFrag [256];//maybe malloc ?
 
-	printf("Sending signal... ");
+        // stuffing (PH)        
+        newFrag[0] = C;
+        newFrag[1] = N;
+        newFrag[2] = L2;
+	newFrag[3] = L1;
+
+        int b = 4;
+        for(int a = 0; a < length ; a++){
+            if(buffer[a] == FLAG || buffer[a] == ESC)
+               newFrag[b] == ESC;               
+            else
+               newFrag[b] = buffer[a];
+            b++;
+        }
+ 
+       	printf("Sending signal... ");
 	
 	tcflush(fd, TCOFLUSH); // Clean output buffer
 
-    write(fd, buffer, length);
+	//Pacote de dados
+        write(fd, newFrag, 256);
 
-    printf("OK!!!\n");
+        printf("[OK]\n");
 }
 
-int llread(int fd, char * buffer) {
+
+int  llread(int fd, char * buffer){
    strcpy(buffer,"");// need to confirm if the buffer is allocated
    int STOPread = FALSE;// think in a better away just for testing
 
@@ -73,17 +101,20 @@ int llread(int fd, char * buffer) {
    int cont = 0;
 while (STOPread==FALSE) {       /* loop for input */
       res = read(fd,buf,255);   /* returns after 5 chars have been input */
-printf("%d\n",res);
-      
-      if (buf[0]=='z' || buf[res-1]=='\0') STOPread=TRUE;// '\0' recebeu o fim da string
+      printf("res = %d\n",res);
+
+      if(res < 0)continue;// try to change the vtime and vmin
+
+      if (buf[res-1]=='\0') STOPread=TRUE;// '\0' recebeu o fim da string
       buf[res]='\0';               /* so we can printf... */
             
-    if(cont++ == 50)break;
       strcat(buffer,buf);             
       
       printf("packet received: \"%s\" -> (size = %d)\n", buf, res);
     }
     printf("Message received: \"%s\" -> (size = %d)\n\n", buffer, (int)strlen(buffer));
+
+   return 0;
 }
 
 int llclose(int fd)

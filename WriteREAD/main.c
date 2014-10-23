@@ -57,13 +57,9 @@ int main(int argc, const char * argv[])
     }
     
     
-    char buffer[255] = "ola eu sou o potter xD";
-    llwrite(app.fileDescriptor, buffer, strlen(buffer));
-
-    int length = llread(app.fileDescriptor, buffer);
-    
-
-     llclose(app.fileDescriptor);
+    // llwrite(int fd, char * buffer, int length);
+    // llread(int fd, char * buffer);
+    // llclose(int fd);
     
     return 0;
 }

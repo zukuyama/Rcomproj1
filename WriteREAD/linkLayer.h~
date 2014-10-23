@@ -30,9 +30,9 @@ typedef struct _link
 void setLinkLayer(linkLayer * link, char p[20], int b, unsigned int s, unsigned int t, unsigned int n, char f[MAX_SIZE]);
 void initLinkLayer(linkLayer * link);
 
-int  llopen(int fd, size_t flag);
-int  llwrite(int fd, char * buffer, int length);
-int  llread(int fd, char * buffer);
+int  llopen(int porta, size_t flag);
+int  llwrite(int id, char * buffer, int length);
+int  llread(int porta, size_t flag);
 int  llclose(int fd);
 
 
