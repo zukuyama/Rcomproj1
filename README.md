@@ -3,6 +3,12 @@ Rcomproj1
 
   Actual
 ==================
+Problem:{
+client->client get(dá bem).
+client->server send (crasha read UA)
+
+
+}
 
 on: ttyS4
     
