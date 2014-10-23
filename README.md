@@ -5,6 +5,7 @@ Rcomproj1
 ==================
 Problem:{
 client->client get(dá bem).
+
 client->server send (crasha read UA)
 
 
