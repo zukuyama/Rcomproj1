@@ -18,6 +18,9 @@
 #define FALSE 0
 #define TRUE 1
 
+#define PRONTO 0xff
+#define DADOS 0xfe
+
 #define FLAG 0x7e
 #define ESC 0x7d
 #define Fstuffing 0x5e
@@ -110,6 +113,122 @@ void initLinkLayer(LinkLayer * link, char p[20])
 
 
 /***********************************************************************************************
+	MAQUINA DE ESTADOS EM TRABALHOS
+ ***********************************************************************************************/
+
+
+
+int indice,maxbuffer;
+unsigned char * buffer;
+
+indice = 0;
+maxbuffer = 5;
+buffer = malloc( sizeof(unsigned char) * maxbuffer );
+
+unsigned char estado = PRONTO;
+unsigned char bcc1   = 0;
+unsigned char bcc2   = 0;
+
+int dados_inicio, dados_fim;
+dados_inicio = 4;
+dados_fim = 4;
+
+int is_comando(unsigned char x)
+{
+    return ( x == C_SET || x == C_DISC );
+}
+
+int is_resposta(unsigned char x)
+{
+    return ( x == C_RR_0 || x == C_RR_1 || x == C_REJ_0 || x == C_REJ_1 || x == C_UA );
+}
+
+
+int maquina_de_estados(unsigned char x)
+{
+    int flag = 0;
+    
+    switch ( estado )
+    {
+        // estado inicial
+        case PRONTO :  if ( x == F ) { estado = F; flag=1; } break;
+            
+        // F
+        case F      :  if ( x == A1 || x == A2 ) { estado=x; flag=1; } break;
+            
+        // A
+        case A1
+        case A2     :  if ( is_comando(x) ) { estado=x; bcc1=(buffer[1] ^ x); flag=1; } break;
+            
+        // C , falta incluir e concluir outros comandos/respostas
+        case C_SET  :
+        case C_DISC :  if ( x == bcc1 ) { estado=x; flag=1; } break;
+            
+        case C_RR_0 :
+        case C_RR_1 :
+        case C_REJ_0:
+        case C_REJ_1:  break;
+            
+        // BCC1 , ??? este tem mais que se lhe diga, falta completar/corrigir
+        case bcc1   :  if ( is_resposta(x) ) { estado=x; flag=1; } break;
+            
+        // DADOS , se entrou aqui então deve continuar a ler até F
+        case DADOS  :  if ( x == F ) { estado=PRONTO; bcc2 = xor(buffer,dados_inicio,dados_fim-1); flag=(bcc2==buffer[dados_fim])?1:0; }
+                       else { dados_fim++; }
+                       break;
+
+    }
+    
+    if ( flag || estado == DADOS ) // se avançar de estado ou estiver a ler dados
+    {
+        if ( indice >= maxbuffer ) // realocar mediante o crescimento da trama
+        {
+            maxbuffer = indice + 1;
+            if (maxbuffer > 1024) /*free(buffer); exit();*/; // EXCEDE TAMANHO PERMITIDO: erro+termina ou dropTrama
+            
+            buffer = realloc( buffer, sizeof(unsigned char) * maxbuffer );
+        }
+        
+        buffer[indice] = x;
+        indice++;
+        
+        return TRUE;
+    }
+    else // se recuar de estado ou falhar
+    {
+        estado = F;
+        
+        // se falhar faz reset ao buffer e variáveis relativas
+        indice = 0;
+        maxbuffer = 5;
+        buffer = realloc( buffer, sizeof(unsigned char) * maxbuffer );
+        
+        bcc1 = 0;
+        bcc2 = 0;
+        
+        dados_inicio = 4;
+        dados_fim = 4;
+        
+        return FALSE;
+    }
+    
+    return FALSE;
+}
+
+void teste(int fd) // isto nao da para testar ainda, mas esta é a ideia de como usar a maquina de estados
+{
+    unsigned char x;
+    
+    while (  )
+    {
+        read(fd,&x,1);
+        resultado = maquina_de_estados(x);
+        processa_resultado(fd,resultado);    // processa e envia respostas ???
+    }
+}
+
+
+/***********************************************************************************************
 	FUNCOES AUXILIARES AO TRATAMENTO DE DADOS
 ***********************************************************************************************/
 int tamanhoFicheiro(char * str)
@@ -199,10 +318,10 @@ unsigned char xor(unsigned char * dados, int xmin, int xmax) // obtem bcc2 da tr
 ***********************************************************************************************/
 unsigned char * tramaI_toPacote(unsigned char * frame, int size, int * tamPacote);
 unsigned char * tramaI(unsigned char * pkg, int size, int * tamTrama);
-void obterTramaSU(unsigned char * frame);
+void            obterTramaSU(unsigned char * frame);
 unsigned char * tramaSU(int emissor, int numSeq, int qualC); // set, ua, disc, rr, rej
 
-void despacotarControlo(unsigned char * pkg, int size);
+void            despacotarControlo(unsigned char * pkg, int size);
 unsigned char * pacotarControlo( char * nomeFicheiro, int tamFicheiro, int modo, int * tamPacote);
 unsigned char * despacotarDados(unsigned char * pkg, int size, int * tamFrag);
 unsigned char * pacotarDados(unsigned char * frag, int numSeq, int size, int * tamPacote);

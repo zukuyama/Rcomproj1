@@ -65,7 +65,7 @@ int read_cc(int fd,unsigned char A, unsigned char cc) // lê um CC
     return 0;
 }
 
-int write_cc(int fd,unsigned char A , unsigned char cc) // escreve o SET
+int write_cc(int fd,unsigned char A , unsigned char cc)
 { 
    int res = 0;
 
