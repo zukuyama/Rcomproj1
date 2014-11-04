@@ -10,7 +10,7 @@
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 
 #define TIMEOUT_LIMIT 3
-#define NUM_TRANSMITIONS 3
+#define NUM_TRANSMITIONS 15
 
 #define TRANSMITTER 1
 #define RECEIVER 0
@@ -39,7 +39,7 @@
 #define C_REJ_1 0x81
 
 #define MFS 256
-#define MTS 1024
+#define MTS 600
 
 #define Cpkg_dados 0x01
 #define Cpkg_inicio 0x02
@@ -76,23 +76,11 @@ typedef struct _link
     unsigned int sequenceNumber; // numero de sequencia da trama: 0 ou 1
     unsigned int timeout; // valor do temporizador (segundos): ex: 3
     unsigned int numTransmissions; //numero de tentativas em caso de falha
-    char frame[MTS]; // trama
 } LinkLayer;
 
-void setLinkLayer(LinkLayer * link, char p[20], int b, unsigned int s, unsigned int t, unsigned int n, char f[MTS])
+void setLinkLayer(LinkLayer * link, unsigned int s)
 {
-    strcpy(link->port, p);
-    link->baudrate = b;
-    link->sequenceNumber = s;
-    link->timeout = t;
-    link->numTransmissions = n;
-    strcpy(link->frame, f);
-}
-
-void setLinkLayer2(LinkLayer * link, unsigned int s, char f[MTS])
-{
-	link->sequenceNumber = s;
-	strcpy(link->frame, f);
+   link->sequenceNumber = s;
 }
 
 void initLinkLayer(LinkLayer * link, char p[20])
@@ -102,8 +90,6 @@ void initLinkLayer(LinkLayer * link, char p[20])
     link->sequenceNumber = 0;
     link->timeout = TIMEOUT_LIMIT;
     link->numTransmissions = NUM_TRANSMITIONS;
-
-    strcpy(link->frame, "");
 }
 
 /***********************************************************************************************
@@ -163,6 +149,24 @@ char * toString(int num) // contem caracteres latinos, terminando em '\0'
 	return(r);
 }
 
+int converterString(int num, char file[10])
+{
+	int i;
+	int dig = numDigitos(num);
+	
+	for (i = 0; i < 10; i++)
+		file[i] = '\0';
+	
+	int v = num;
+	for (i = (dig - 1); i >= 0; i--)
+	{
+		int x = v % 10;
+		v /=10;
+		file[i] = (char) x;
+	}
+	return(dig);
+}
+
 void colocarFicheiro(FILE * ficheiro, unsigned char * content, int size) // ficheiro aberto em modo "w" ou "w+"
 {
 	int k;
@@ -183,8 +187,10 @@ void verDados(unsigned char * str, int size)
 	} printf("\n\n");
 }
 
-unsigned char xor(unsigned char * dados, int xmin, int xmax) // obtem bcc2 da trama entre xmin e xmax
+unsigned char xoor(unsigned char dados[MTS], int xmin, int xmax) // obtem bcc2 da trama entre xmin e xmax
 {
+	//printf("INSIDE XOR FUNCTION: XOR[0]: 0x%X | XOR[SIZE]: 0x%X\n", dados[xmin], dados[xmax]);	
+	//printf("INSIDE XOR FUNCTION: XOR[0]: %d | XOR[SIZE]: %d\n", xmin, xmax);	
 	unsigned char r = dados[xmin];
 	int i;	
 	for (i = (xmin+1); i <= xmax; i++)
@@ -211,6 +217,42 @@ void copyPacote(unsigned char * origem, unsigned char * destino, int n)
 	//verDados(destino, n);
 }
 
+void limparFrame(unsigned char frame[MTS])
+{
+	int i;
+	for (i = 0; i < MTS; i++)
+	{
+		frame[i] = '\0';
+	}
+}
+
+void limparPacote(unsigned char pkg[MTS])
+{
+	int i;
+	for (i = 0; i < MTS; i++)
+	{
+		pkg[i] = '\0';
+	}
+}
+
+void limparDados(unsigned char pkg[MFS + 1])
+{
+	int i;
+	for (i = 0; i < (MFS + 1); i++)
+	{
+		pkg[i] = '\0';
+	}
+}
+
+void limparNomeFicheiro(char file[30])
+{
+	int i;
+	for (i = 0; i < 30; i++)
+	{
+		file[i] = '\0';
+	}
+}
+
 void mostrarEstadoTransferencia(float percentagem)
 {
 	int numBarras = 10;
@@ -233,30 +275,27 @@ void mostrarEstadoTransferencia(float percentagem)
 /***********************************************************************************************
 	FUNCOES TRATAMENTO DE DADOS
 ***********************************************************************************************/
-unsigned char * tramaI_toPacote(unsigned char * frame, int size, int * tamPacote);
-unsigned char * tramaI(unsigned char * pkg, int size, int * tamTrama);
-void obterTramaSU(unsigned char * frame);
-unsigned char * tramaSU(int emissor, int numSeq, int qualC); // set, ua, disc, rr, rej
+int iFrameToPackage(unsigned char frame[MTS], int size, unsigned char pkg[MFS + 10]);
+int iFrame(unsigned char pkg[MFS + 10], int size, unsigned char frame[MTS]);
+void suFrameExtract(unsigned char frame[MTS]);
+int suFrame(int emissor, int numSeq, int qualC, unsigned char frame[MTS]); // set, ua, disc, rr, rej
 
-void despacotarControlo(unsigned char * pkg, int size, char * fileName, int * tamFile);
-unsigned char * pacotarControlo( char * nomeFicheiro, int tamFicheiro, int modo, int * tamPacote);
-unsigned char * despacotarDados(unsigned char * pkg, int size, int * tamFrag);
-unsigned char * pacotarDados(unsigned char * frag, int numSeq, int size, int * tamPacote);
-
+void packageToControl(unsigned char pkg[MFS + 10], int size, char * fileName, int * tamFile);
+int controlToPackage( char * nomeFicheiro, int tamFicheiro, int modo, unsigned char pkg[MFS + 10]);
+int dataToPackage(unsigned char data[MFS+1], int numSeq, int size, unsigned char pkg[MFS + 10]);
+int packageToData(unsigned char pkg[MFS + 10], int size, unsigned char data[MFS + 1]);
 /*======================================================
 *		FUNCOES AO NIVEL DO LINK LAYER
 =======================================================*/
-
-unsigned char * tramaI_toPacote(unsigned char * frame, int size, int * tamPacote)
+int iFrameToPackage(unsigned char frame[MTS], int size, unsigned char pkg[MFS + 10])
 {
 	//printf("-------------------------\nFRAME I UNBUILDER\n-------------------------\n");
 	
-	unsigned char * pkg = 
-		(unsigned char*) malloc(sizeof(unsigned char) * (size));
-	
 	//printf("Tamanho da trama: %d\n", size);
 	//verDados(frame, size);
-		
+	
+	limparPacote(pkg);
+	
 	unsigned char N = frame[0];
 	unsigned char A = frame[1];
 	unsigned char C = frame[2];
@@ -299,48 +338,43 @@ unsigned char * tramaI_toPacote(unsigned char * frame, int size, int * tamPacote
 		
 		//pkg[i - 4] = frame[i];
 	}
-	*tamPacote = (j - 1);
 	
 	//verDados(pkg, (*tamPacote));
 	
-	return(pkg);
+	return( j - 1 );
 }
 
-// frag: [0..MFS], pkg: [0.. MFS+4[, 
-
-unsigned char * tramaI(unsigned char * pkg, int size, int * tamTrama)
+int iFrame(unsigned char pkg[MFS + 10], int size, unsigned char frame[MTS])
 {
-	unsigned char * trama = 
-		(unsigned char*) malloc(sizeof(unsigned char) * (MTS));
-		
+	limparFrame(frame);
 	//printf("-------------------------\nFRAME I BUILDER\n-------------------------\n");
 	//printf("Tamanho do pacote: %d\n", size);
 	//verDados(pkg, size);
 	
 	int si = 0; //size of trama
 
-	trama[0] = FLAG;
-	trama[1] = 0x03;
+	frame[0] = FLAG;
+	frame[1] = 0x03;
 
 	if(pkg[0] == 0x01) // pacote de dados
 	{
 		int num = (int) pkg[1];
 		if ( num % 2 == 0) // se pkg.N par
 		{
-			trama[2] = 0x00;	
+			frame[2] = 0x00;	
 		}
 		else
 		{
-			trama[2] = 0x40;	
+			frame[2] = 0x40;	
 		}
 	}
 	else // pacote de controlo
 	{
-		trama[2] = 0x00;
+		frame[2] = 0x00;
 	}
 	
 	// bcc1
-	trama[3] = (trama[1] ^ trama[2]);
+	frame[3] = (frame[1] ^ frame[2]);
 
 	int i;
 	int b = 4;
@@ -349,23 +383,23 @@ unsigned char * tramaI(unsigned char * pkg, int size, int * tamTrama)
 	{	
 		if (pkg[i] == ESC) // ESC
 		{
-			trama[b] = ESC;
+			frame[b] = ESC;
 			b++;
-			trama[b] = 0x5d;
+			frame[b] = 0x5d;
 			b++;
 		}
 		else
 		{
 			if (pkg[i] == FLAG) // FLAG
 			{
-				trama[b] = ESC;
+				frame[b] = ESC;
 				b++;
-				trama[b] = 0x5e;
+				frame[b] = 0x5e;
 				b++;
 			}
 			else
 			{
-				trama[b] = pkg[i];
+				frame[b] = pkg[i];
 				b++;
 			}
 		}
@@ -376,12 +410,11 @@ unsigned char * tramaI(unsigned char * pkg, int size, int * tamTrama)
 	i = 5 + size;
 		
 	// bcc2
-	trama[b] = xor(pkg, 0, (size+0));
+	frame[b] = xoor(frame, 4, b - 1); //xor(pkg, 0, (size));
+	//printf("RESULTDO DO XOR: 0x%X\n", frame[b]);
 	b++;
-	trama[b] = FLAG;
+	frame[b] = FLAG;
 	b++;
-	
-	*tamTrama = (b - 1);
 
 	//printf("Tamanho trama I: %d\n", (*tamTrama));
 
@@ -391,83 +424,65 @@ unsigned char * tramaI(unsigned char * pkg, int size, int * tamTrama)
 	
 	//printf("[0x%X, 0x%X, 0x%X, 0x%X, ..., 0x%X, 0x%X]\n", trama[0], trama[1], trama[2], trama[3], trama[(*tamTrama)-1], trama[(*tamTrama)]);
 	
-	return(trama);
+	return(b - 1);
 }
 
-void obterTramaSU(unsigned char * frame)
-{
-	//printf("-------------------------\nFRAME SU UNBUILDER\n-------------------------\n");
-	unsigned char F = frame[0];
-	unsigned char A = frame[1];
-	unsigned char C = frame[2];
-	unsigned char Bcc1 = (A ^ C);
-	unsigned char Ffinal = frame[4];
-
-	if (Bcc1 != (frame[1] ^ frame[2]))
-		printf("Erro\n");
-
-	//printf("[0x%X, 0x%X, 0x%X, 0x%X, 0x%X]\n", F, A, C, Bcc1, Ffinal);
-}
-
-unsigned char * tramaSU(int emissor, int qualC, int numSeq) // tem sempre 5 bytes
+int suFrame(int emissor, int numSeq, int qualC, unsigned char frame[MTS])
 {
 	//printf("-------------------------\nFRAME SU BUILDER\n-------------------------\n");
-	unsigned char * trama = 
-		(unsigned char*) malloc(sizeof(unsigned char) * 5);
+	limparFrame(frame);
 	
-	trama[0] = FLAG;
+	frame[0] = FLAG;
 	
 	switch(qualC)
 	{
 		case 0: // SET -> comando
-			trama[2]	= 0x03;
-			trama[1] = (emissor == 1) ? 0x03 : 0x01;
+			frame[2]	= 0x03;
+			frame[1] = (emissor == 1) ? 0x03 : 0x01;
 			break;
 		case 1: // DISC -> comando
-			trama[2]	= 0x0b;
-			trama[1] = (emissor == 1) ? 0x03 : 0x01;		
+			frame[2]	= 0x0b;
+			frame[1] = (emissor == 1) ? 0x03 : 0x01;		
 			break;
 		case 2: // UA -> resposta
-			trama[2]	= 0x07;
-			trama[1] = (emissor == 1) ? 0x01 : 0x03;		
+			frame[2]	= 0x07;
+			frame[1] = (emissor == 1) ? 0x01 : 0x03;		
 			break;
 		case 3: // RR -> resposta
 			if ((numSeq % 2) == 0)
 			{
-				trama[2]	= 0x85;
+				frame[2]	= 0x85;
 			}
 			else
 			{
-				trama[2]	= 0x05;			
+				frame[2]	= 0x05;			
 			}
-			trama[1] = (emissor == 1) ? 0x01 : 0x03;		
+			frame[1] = (emissor == 1) ? 0x01 : 0x03;		
 			break;
 		case 4: // REJ -> resposta
 			if ((numSeq % 2) == 0)
 			{
-				trama[2]	= 0x81;
+				frame[2]	= 0x81;
 			}
 			else
 			{
-				trama[2]	= 0x01;			
+				frame[2]	= 0x01;			
 			}
-			trama[1] = (emissor == 1) ? 0x01 : 0x03;		
+			frame[1] = (emissor == 1) ? 0x01 : 0x03;		
 			break;
 	}
-	trama[3] = (trama[1] ^ trama[2]);
-	trama[4] = FLAG;
+	frame[3] = (frame[1] ^ frame[2]);
+	frame[4] = FLAG;
 
 	//printf("[0x%X, 0x%X, 0x%X, 0x%X, 0x%X]\n", trama[0], trama[1], trama[2], trama[3], trama[4]);
 	
 	//verDados(trama, 5);
 	
-	return(trama);
+	return(5);
 }
 
-/*======================================================
-*		FUNCOES AO NIVEL DA APPLICATION LAYER
-=======================================================*/
-void despacotarControlo(unsigned char * pkg, int size, char * fileName, int * tamFile)
+
+void packageToControl(unsigned char pkg[MFS + 10], int size, char * fileName, int * tamFile)
 {
 	//printf("-------------------------\nCONTROL UNPACKET\n-------------------------\n");
 	
@@ -514,7 +529,7 @@ void despacotarControlo(unsigned char * pkg, int size, char * fileName, int * ta
 	// armazenar tamanho e nome do ficheiro no lado do llread() 
 }
 
-unsigned char * pacotarControlo( char * nomeFicheiro, int tamFicheiro, int modo, int * tamPacote)
+int controlToPackage( char * nomeFicheiro, int tamFicheiro, int modo, unsigned char pkg[MFS + 10])
 {
 	//controlPacket(int modo, char * str_file, int tam_file)
 
@@ -528,10 +543,7 @@ unsigned char * pacotarControlo( char * nomeFicheiro, int tamFicheiro, int modo,
 		1 + 1 + comprimentoFile + 
 		1 + 1 + comprimentoTamanho;	
 
-	unsigned char * pkg = (unsigned char *)
-		malloc(sizeof(unsigned char) * (total+1));
-
-	strcpy(pkg, "");
+	limparPacote(pkg);
 	
 	i = 0;
 	if (modo == 2) // 0x01 -> inicio de transmissao
@@ -582,21 +594,19 @@ unsigned char * pacotarControlo( char * nomeFicheiro, int tamFicheiro, int modo,
 	
 	//printf("%d, ...]\n", j);
 
-	*tamPacote = i - 1;
 	//printf("Tamanho do pacote: %d\n\n", *tamPacote - 1);
 		
-	return(pkg);
+	return(i - 1);
 }
 
-unsigned char * despacotarDados(unsigned char * pkg, int size, int * tamFrag)
+int packageToData(unsigned char pkg[MFS + 10], int size, unsigned char data[MFS + 1])
 {
 	//printf("-------------------------\nDATA UNPACKET\n-------------------------\n");
 	
 	//printf("Tamanho do pacote: %d\n", size);
 	//verDados(pkg, size);
 	
-	unsigned char * data = (unsigned char *)
-		malloc(sizeof(unsigned char) * (MFS+1));
+	limparDados(data);
 	
 	unsigned char C = pkg[0];
 	unsigned char N = pkg[1];
@@ -623,16 +633,15 @@ unsigned char * despacotarDados(unsigned char * pkg, int size, int * tamFrag)
 		data[j] = pkg[i];
 		j++;
 	}
-	*tamFrag = (j - 1);
 	
 	//printf("Tamanho do fragmento: %d\n\n", (*tamFrag));
 	
 	//verDados(data, *tamFrag);
 	
-	return(data);
+	return(j - 1);
 }
 
-unsigned char * pacotarDados(unsigned char * frag, int numSeq, int size, int * tamPacote)
+int dataToPackage(unsigned char data[MFS+1], int numSeq, int size, unsigned char pkg[MFS + 10])
 {
 	//printf("===========================\nDATA PACKET\n-------------------------\n");
 	//printf("Tamanho do fragmento: %d\n", size);
@@ -650,10 +659,7 @@ unsigned char * pacotarDados(unsigned char * frag, int numSeq, int size, int * t
 	
 	//printf("[C, N, L2, L1]: [0x%X, 0x%X, 0x%X, 0x%X]\n", C, N, L2, L1);
 
-	unsigned char * pkg = (unsigned char *)
-		malloc(sizeof(unsigned char) * (MFS + 10));
-		
-	strcpy(pkg, "");
+	limparPacote(pkg);
 	
 	int a, b = 4;
 	
@@ -664,11 +670,9 @@ unsigned char * pacotarDados(unsigned char * frag, int numSeq, int size, int * t
 
 	for (a = 0; a <= size; a++)
 	{
-		pkg[b] = frag[a];
+		pkg[b] = data[a];
 		b++;
 	}
-
-	*tamPacote = (b - 1);
 	
 	//printf("PKG[ultimo]: 0x%X\n\n", pkg[b-1]);
 		
@@ -683,7 +687,7 @@ unsigned char * pacotarDados(unsigned char * frag, int numSeq, int size, int * t
 	
 	//verDados(pkg, *tamPacote) ;
 	
-	return(pkg);
+	return(b - 1);
 }
 
 #endif

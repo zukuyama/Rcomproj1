@@ -3,6 +3,7 @@
 int main(int argc, char ** argv)
 {
 	system("clear");
+	initAppLayer(&app);
 	
 	if (argc >= 1) // ha argumentos
 	{
@@ -21,7 +22,8 @@ int main(int argc, char ** argv)
 					exit(1);
 				}
 
-				nomeFicheiro = argv[3];
+				//nomeFicheiro = argv[3];
+				strcpy(nomeFicheiro, argv[3]);
 				tamFicheiro = tamanhoFicheiro(nomeFicheiro);
 				
 				if (tamFicheiro == -1)
@@ -61,7 +63,7 @@ int main(int argc, char ** argv)
    setEmissorDevice(argv[1], argv[2]);
 	
 	//initLinkLayer(&lnk, device);
-  	initAppLayer(&app);
+  
 	
 	app.status = (eEmissor == 1) ? TRANSMITTER : RECEIVER ;
   	app.fileDescriptor = llopen(device,app.status);
@@ -78,30 +80,48 @@ int main(int argc, char ** argv)
 	/****************************************
 				TRATAMENTO DE DADOS
 	*****************************************/
+	//return(0);
+	int resultado = funcaoIO(); if (resultado < 0) return(-1);
+		
+	/****************************************
+				TERMINAR O PROGRAMA
+	*****************************************/
+	//sleep(1);
 	
+	llclose(app.fileDescriptor);
+	
+
+	printf("\nPROGRAMA TERMINOU CORRECTAMENTE\n");
+	printf("==============================================\n");
+	exit(0);
+}
+
+int funcaoIO()
+{
 	if (app.status == TRANSMITTER)
 	{
 		// envio do pacote de controlo de inicio da transferencia do ficheiro
 		sleep(1);
 		int tamPacote = 0;
-		unsigned char * informacaoFile = pacotarControlo(nomeFicheiro, tamFicheiro, Cpkg_inicio, &tamPacote);
+		
+		//unsigned char * informacaoFile = pacotarControlo(nomeFicheiro, tamFicheiro, Cpkg_inicio, &tamPacote);
+		limparPacote(PACOTE);
+		tamPacote = controlToPackage(nomeFicheiro, tamFicheiro, Cpkg_inicio, PACOTE);
 		
 		int estEnvio = 0;
-		estEnvio = llwrite(app.fileDescriptor, informacaoFile, tamPacote);
-
+		estEnvio = llwrite(app.fileDescriptor, PACOTE, tamPacote);
+		
 		// enviar a informacao
 		int linhaActual = 0, i = 0;
 		f = fopen(nomeFicheiro, "rb");		
 		
 		unsigned char string[MFS];
 		strcpy(string, "");
-
-		unsigned char * pkg;
-		unsigned char * data;
+		
 		int tamDados = 0;
 		
 		int res = 0;
-			
+		
 		int aux = fgetc(f);
 		while(aux != EOF)
 		{
@@ -112,18 +132,13 @@ int main(int argc, char ** argv)
 			{	
 				sleep(1);		
 				//tamPacote = 0;
-				pkg = pacotarDados(string, linhaActual, MFS, &tamPacote);
-				printf("Tamanho do pacote: %d\n", tamPacote);
-				/*
-				int k;
-				for(k = 0; k <= MFS; k++)
-				{
-					printf("0x%X ", string[k]);
-					if ( (k+5) % 15 == 0)
-						printf("\n");
-				}
-				*/
-				res = llwrite(app.fileDescriptor, pkg, tamPacote);		
+				//pkg = pacotarDados(string, linhaActual, MFS, &tamPacote);
+				limparPacote(PACOTE);
+				//setLinkLayer(&lnk, (lnk.sequenceNumber+1)%2);
+				tamPacote = dataToPackage(string, linhaActual, MFS, PACOTE);
+				//printf("Tamanho do pacote: %d\n", tamPacote);
+				
+				res = llwrite(app.fileDescriptor, PACOTE, tamPacote);		
 				if (res < 0)
 				{
 					printf("PROBLEMA AO ENVIAR A TRAMA... PROGRAMA TERMINOU\n");
@@ -138,45 +153,44 @@ int main(int argc, char ** argv)
 			}
 			aux = fgetc(f);
 		}
-		/*
-		int k;
-				for(k = 0; k <= i; k++)
-				{
-					printf("0x%X ", string[k]);
-					if ( (k+5) % 15 == 0)
-						printf("\n");
-				}
-		*/
-		pkg = pacotarDados(string, linhaActual, i, &tamPacote);
-		res = llwrite(app.fileDescriptor, pkg, tamPacote);
+		
+		sleep(1);
+		
+		limparPacote(PACOTE);	
+		tamPacote = dataToPackage(string, linhaActual, i, PACOTE);
+		res = llwrite(app.fileDescriptor, PACOTE, tamPacote);
 
-		//printf("Resultdo final: %d\n", res);
+		printf("Resultdo llwrite(): %d\n", res);
 
 		linhaActual++;
 		printf("Linha %d\n", linhaActual);
 
 		fclose(f);
-
+		
 		sleep(1);
-
+		//setLinkLayer(&lnk, 0);
 		// envio do pacote de controlo de inicio da transferencia do ficheiro
 		//printf("\n\n\nULTIMO PACOTE DE CONTROLO\n");
-		informacaoFile = pacotarControlo(nomeFicheiro, tamFicheiro, Cpkg_fim, &tamPacote);
+		limparPacote(PACOTE);
+		tamPacote = controlToPackage(nomeFicheiro, tamFicheiro, Cpkg_fim, PACOTE);
 
 		estEnvio = 0;
-		estEnvio = llwrite(app.fileDescriptor, informacaoFile, tamPacote);
+		estEnvio = llwrite(app.fileDescriptor, PACOTE, tamPacote);
 	}
 	else
 	{
 		//unsigned char * * info = (unsigned char**) malloc( sizeof(unsigned char));
-		unsigned char * informacaoFile = (unsigned char*) malloc( sizeof(unsigned char) * MFS );
 		
 		//printf("Endereco informacaoFILE: %d\n", &informacaoFile[0]);
 		//printf("Endereco informacaoFILE: %d\n", &info[0][0]);
 
 		//int tamFile = llread(app.fileDescriptor, &info);
-		int tamFile = llread(app.fileDescriptor, informacaoFile);
-
+		//setLinkLayer(&lnk, 1);
+		
+		limparPacote(PACOTE);
+		int tamFile = llread(app.fileDescriptor, PACOTE);
+		
+		//printf("Tamanho llread(): %d\n", tamFile);
 		//printf("Endereco informacaoFILE apos llread(): %d\n", &informacaoFile[0]);
 
 	//printf("Endereco informacaoFILE apos llread(): %d\n", &info[0][0]);
@@ -191,10 +205,11 @@ int main(int argc, char ** argv)
 		
 		//verDados(informacaoFile, tamFile);
 		//if (nomeFicheiro == NULL)
-		nomeFicheiro = (char *)malloc(sizeof(char) * 255);
+		//nomeFicheiro = (char *)malloc(sizeof(char) * 255);
+		limparNomeFicheiro(nomeFicheiro);
 		tamFicheiro = 0;
-
-		despacotarControlo(informacaoFile, (tamFile), nomeFicheiro, &tamFicheiro);
+		
+		packageToControl(PACOTE, (tamFile), nomeFicheiro, &tamFicheiro);
 		
 		//printf("Nome ficheiro: %s\n", nomeFicheiro);
 		//printf("Tamanho do ficheiro: %d\n", tamFicheiro);
@@ -205,7 +220,8 @@ int main(int argc, char ** argv)
 		}
 		
 		//nomeFicheiro = "galinha.gif";
-
+		strcpy(nomeFicheiro, "galinha.gif");
+		
 		// armazenar a informacao
 		int tamActual = 0;
 		f = fopen(nomeFicheiro, "wb+");		
@@ -219,23 +235,23 @@ int main(int argc, char ** argv)
 		int linha = 0;
 		while (tamActual < tamFicheiro)
 		{
-			pkg = NULL;
-			data = NULL;
-			pkg = (unsigned char*) malloc( sizeof(unsigned char) * MFS );
-			tamPacote = llread(app.fileDescriptor, pkg);
+			limparPacote(PACOTE);
+			limparDados(DADOS);
+			//setLinkLayer(&lnk, (lnk.sequenceNumber+1)%2);
+			tamPacote = llread(app.fileDescriptor, PACOTE);
 			
 			linha++;
-			//printf("LINHA %d\n", linha);
-
-			//printf("Tamanho llread(): %d\n", tamPacote);
-
-			data = despacotarDados(pkg, tamPacote, &tamDados);
+			printf("LINHA %d\n", linha);
 			
+			//verDados(PACOTE, tamPacote);
+			//printf("Tamanho llread(): %d\n", tamPacote);
+			
+			int tamDados = packageToData(PACOTE, tamPacote, DADOS);
 			//printf("Tamanho dados: %d\n", tamDados);
 			
 			//verDados(data, tamDados);
 
-			colocarFicheiro(f, data, tamDados);
+			colocarFicheiro(f, DADOS, tamDados);
 			//printf("Tamanho lido: %d\n", tamDados);
 			//if (pkg != NULL)
 			//free(pkg);
@@ -253,15 +269,12 @@ int main(int argc, char ** argv)
 		}
 		
 		fclose(f);
-
+		//setLinkLayer(&lnk, 1);
+		
 		// envio do pacote de controlo de inicio da transferencia do ficheiro		
 		//printf("\n\n\nULTIMO PACOTE DE CONTROLO\n");
-		free(informacaoFile);
-		informacaoFile=NULL;//ADDED TO TEST
-
-		informacaoFile = (unsigned char*) malloc( sizeof(unsigned char) * MFS );
-
-		tamFile = llread(app.fileDescriptor, informacaoFile);
+		limparPacote(PACOTE);
+		tamFile = llread(app.fileDescriptor, PACOTE);
 
 		if (tamFile == -1)
 		{
@@ -269,12 +282,16 @@ int main(int argc, char ** argv)
 			return(-1);
 		}
 		
-		char * fff = (unsigned char*) malloc( sizeof(unsigned char) * MFS );
+		//char * fff = (unsigned char*) malloc( sizeof(unsigned char) * MFS );
+		char fff[30];
+		limparNomeFicheiro(fff);
+		
 		unsigned int ttt = 0;
 
 		//nomeFicheiro = "pinguim.gif";
-
-		despacotarControlo(informacaoFile, (tamFile), fff, &ttt);
+		strcpy(nomeFicheiro, "pinguim.gif");
+		
+		packageToControl(PACOTE, (tamFile), fff, &ttt);
 		
 		//printf("%s %d\n", fff, ttt);
 		int rrr = strcmp(fff, nomeFicheiro);
@@ -284,18 +301,7 @@ int main(int argc, char ** argv)
 			printf("ERRO NO PACOTE DE CONTROLO DE FIM DE TRANSFERENCIA\n");
 			return(-1);
 		}
-		free(informacaoFile);
 	}
-	
-	/****************************************
-				TERMINAR O PROGRAMA
-	*****************************************/
-	
-	llclose(app.fileDescriptor);
-	
-	printf("\nPROGRAMA TERMINOU CORRECTAMENTE\n");
-	printf("==============================================\n");
-	exit(0);
 }
 
 /************************************************************************************************************************
@@ -317,7 +323,9 @@ int llopen(int porta, size_t flaggg)
 		printf("LLOPEN() :: PORTA %d INVALIDA\n", porta);
 		return(-1);
 	}
-
+	
+	initLinkLayer(&lnk, portaa);
+	
 	r = open(portaa, O_RDWR | O_NOCTTY);
 	if (r == -1)
 	{
@@ -327,15 +335,16 @@ int llopen(int porta, size_t flaggg)
 	
 	if (flaggg == TRANSMITTER) // llopen do TRANSMITTER
 	{
-		set_newsettings(r, 0.1, 0); // 0.1 0 
+		set_newsettings(r, 0.1, 0.0); // 0.1 0    ------> 0.1 0.1
 		
-		unsigned char * tramaSET = tramaSU(r, 0, 0); // tramaSU(int eEmissor, int qualCtrama, int 0 ou 1)
+		limparFrame(TRAMA);
+		int tamSU = suFrame(1, 0, 0, TRAMA); // int numSeq, int qualC
 		
-		//verDados(tramaSET, 4);
+		//verDados(TRAMA, tamSU);
+		limparFrame(TRAMA2);
+		int tamUA = enviarrComAlarme(r, TRAMA, tamSU, TRAMA2, A1, C_UA);
 		
-		unsigned char * tramaUA = (unsigned char*) malloc( sizeof(unsigned char) * MTS );
-		
-		int tamUA = enviarComAlarme(r, tramaSET, 5, tramaUA, A1, C_UA);
+		//verDados(TRAMA2, tamUA);
 		
 		if (tamUA < 0)
 		{
@@ -355,12 +364,32 @@ int llopen(int porta, size_t flaggg)
 	}
 	else if (flaggg == RECEIVER) // llopen do RECEIVER
 	{
-		set_newsettings(r, 0.1, 0); // 0 5
+		set_newsettings(r, 0.1, 1.0); // ------> 0.1 1.0
+		contador = 0;
 		
-		unsigned char * tramaSET = (unsigned char*) malloc( sizeof(unsigned char) * MTS );
-		int tamSET = lerSemAlarme(r, tramaSET);
+		int tamSET = 0;
+		int estadoDFA = 0;
 		
+		do
+		{
+			limparFrame(TRAMA);
+			tamSET = leerSemAlarme(r, TRAMA);
+
+			verDados(TRAMA, tamSET);
+			//TRAMA[1] = 0x45;
+			estadoDFA = maquinaEstados(TRAMA, tamSET, A1, C_SET);
+			contador++;
+			//printf("Contador: %d\n", contador);
+		}
+		while(contador <= NUM_TRANSMITIONS && estadoDFA != 0);
+		
+		//verDados(TRAMA, tamSET);
 		//printf("Tamanho SET: %d\n", tamSET);
+		
+		if (estadoDFA < 0)
+		{
+			return(-1);
+		}
 		
 		if (tamSET < 0)
 		{
@@ -372,11 +401,12 @@ int llopen(int porta, size_t flaggg)
 		{
 			printf("TRAMA SET RECEBIDA... A ENVIAR UA\n");
 			
-			unsigned char * tramaUA = tramaSU(r, 2, 1);
-			//verDados(tramaUA, 4);
+			limparFrame(TRAMA2);
+			int tamUA = suFrame(0, 1, 2, TRAMA2);
 			
-			enviar(r, tramaUA, 5);
+			//verDados(TRAMA2, tamUA);
 			
+			enviarr(r, TRAMA2, tamUA);
 		}
 		else // invalido
 		{
@@ -401,15 +431,15 @@ int llclose(int fd)
 	
 	if (app.status == TRANSMITTER) // codigo do Emissor
 	{
+				
 		//printf("Codigo do emissor do llclose()\n");
-		unsigned char * tramaDISC = tramaSU(app.status, 1, 0); // tramaSU(int eEmissor, int qualCtrama, int 0 ou 1)
+		limparFrame(TRAMA);
+		int tamDisc = suFrame(app.status, 0, 1, TRAMA); // tramaSU(int eEmissor, int qualCtrama, int 0 ou 1)
 		
-		//verDados(tramaSET, 4);
-		
-		unsigned char * tramaDISC2 = (unsigned char*) malloc( sizeof(unsigned char) * MTS );
-		
+		//verDados(tramaSET, 4);		
 		printf("A ENVIAR TRAMA DISC\n");
-		int tamDISC2 = enviarComAlarme(app.fileDescriptor, tramaDISC, 5, tramaDISC2, A2, C_DISC);
+		limparFrame(TRAMA2);
+		int tamDISC2 = enviarrComAlarme(app.fileDescriptor, TRAMA, 5, TRAMA2, A2, C_DISC);
 		
 		//printf("TAMANHO DO TAMDISC2: %d\n", tamDISC2);
 
@@ -420,16 +450,35 @@ int llclose(int fd)
 		}
 		printf("TRAMA DISC RECEBIDA... A ENVIAR UA\n");
 		
-		unsigned char * tramaUA = tramaSU(app.status, 2, 0); // tramaSU(int eEmissor, int qualCtrama, int 0 ou 1)
-		int res = enviarSemAlarme(app.fileDescriptor, tramaUA, 5);
-		
+		limparFrame(TRAMA);
+		int tamUA = suFrame(app.status, 0, 2, TRAMA); // tramaSU(int eEmissor, int qualCtrama, int 0 ou 1)
+		int res = enviarrSemAlarme(app.fileDescriptor, TRAMA, 5);
+
 		//printf("TAMANHO DO TAMDISC2: %d\n", tamDISC2);
 	}
 	else // codigo do Receptor
 	{
-		//printf("Codigo do receptor do llclose()\n");
-		unsigned char * tramaDISC = (unsigned char*) malloc( sizeof(unsigned char) * MTS );
-		int tamDISC = lerSemAlarme(app.fileDescriptor, tramaDISC);
+		contador = 0;
+		
+		int tamDISC = 0;
+		int estadoDFA = 0;
+		//limparFrame(TRAMA);
+		do
+		{
+			limparFrame(TRAMA);
+			tamDISC = leerSemAlarme(app.fileDescriptor, TRAMA);
+
+			//TRAMA[1] = 0x45;
+			estadoDFA = maquinaEstados(TRAMA, tamDISC, A1, C_DISC);
+			contador++;
+			//printf("Contador: %d\n", contador);
+		}
+		while(contador <= NUM_TRANSMITIONS && estadoDFA != 0);
+		
+		if(estadoDFA != 0)
+		{
+			return(-1);
+		}
 		
 		//printf("TAMANHO DO TAMDISC: %d\n", tamDISC);
 
@@ -448,13 +497,11 @@ int llclose(int fd)
 		}
 		
 		printf("TRAMA DISC RECEBIDA\nA ENVIAR SEGUNDA TRAMA DISC\n");
+		limparFrame(TRAMA);
+		int tamDISC2 = suFrame(app.status, 0, 1, TRAMA);
 			
-		unsigned char * tramaDISC2 = tramaSU(app.status, 1, 0);
-			
-		//verDados(tramaDISC2, 4);
-
-		unsigned char * tramaUA = (unsigned char*) malloc( sizeof(unsigned char) * MTS );
-		int tamUA = enviarComAlarme(app.fileDescriptor, tramaDISC2, 5, tramaUA, A2, C_UA);
+		limparFrame(TRAMA2);
+		int tamUA = enviarrComAlarme(app.fileDescriptor, TRAMA, 5, TRAMA2, A2, C_UA);
 			
 		//printf("TAMANHO DO TAMUA: %d\n", tamUA);
 		
@@ -471,21 +518,23 @@ int llclose(int fd)
 		}		
 	}
 	
+	sleep(1);
 	set_oldsettings(fd);
 	close(fd);
 
 	return(0);
 }
 
-int llwrite(int fd, unsigned char * buffer, int length) // (file, pck, tamPKG)
+int llwrite(int fd,  char * buffer, int length) // (file, pck, tamPKG)
 {
+	
 	printf("\n\t\tLLWRITE()\n");
 	int r = 0;
 	
-	int tamTrama = 0;
-	unsigned char * trama = tramaI(buffer, length, &tamTrama);
+	limparFrame(TRAMA);
+	int tamTrama = iFrame(buffer, length, TRAMA);
 	
-	unsigned char Cs = trama[2];
+	unsigned char Cs = TRAMA[2];
 	unsigned char Cr = 0x00;
 	if (Cs == C_S_0)
 	{
@@ -502,69 +551,142 @@ int llwrite(int fd, unsigned char * buffer, int length) // (file, pck, tamPKG)
 	}
 	
 	//printf("Cs Cr: 0x%X 0x%X\n", Cs, Cr);
-	
-	unsigned char * trama2 = (unsigned char*) malloc( sizeof(unsigned char) * MTS );
-	// app.fileDescriptor, tramaDISC, 5, tramaDISC2, A2, C_DISC);
-	int tamResposta = enviarComAlarme(app.fileDescriptor, trama, tamTrama+1, trama2, A1, Cr);
+	limparFrame(TRAMA2);
+	int tamResposta = enviarrComAlarme(app.fileDescriptor, TRAMA, tamTrama+1, TRAMA2, A1, Cr);
 	
 	if (tamResposta < 0)
 		return(tamResposta);
 
 	return(tamTrama);
+
+	/*
+	printf("\n\t\tLLWRITE()\n");
+	int r = 0;
+	int tamResposta = 0, tamTrama = 0;
+	int estadoDFA = 0;
+
+	do
+	{
+		limparFrame(TRAMA);
+		tamTrama = iFrame(buffer, length, TRAMA);
+	
+		unsigned char Cs = TRAMA[2];
+		unsigned char Cr = 0x00;
+		if (Cs == C_S_0)
+		{
+			Cr = C_RR_1;
+		}
+		else if (Cs == C_S_1)
+		{
+			Cr = C_RR_0;
+		}
+		else
+		{
+			printf("Erro na trama: Caracter do C corresponde ao 0x%X\n", Cs);
+			return(-1);
+		}
+	
+		//printf("Cs Cr: 0x%X 0x%X\n", Cs, Cr);
+		limparFrame(TRAMA2);
+		tamResposta = enviarrComAlarme(app.fileDescriptor, TRAMA, tamTrama+1, TRAMA2, A1, Cr); 
+ 	}
+	while(tamResposta < 0);
+
+	if (tamResposta < 0)
+		return(tamResposta);
+
+	return(tamTrama);*/
 }
 
-int llread(int fd, unsigned char * buffer)
+int llread(int fd,  char * buffer)
 {
 	printf("\n\t\tLLREAD()\n");
 
 	//printf("Endereco buffer: %d\n", &buffer[0]);
 	
-	int r = 0;
+	int tamPacote = 0, tamTrama = 0, tamTrama2 = 0, res = 0;
 
-	unsigned char * trama = (unsigned char*) malloc( sizeof(unsigned char) * MTS );
+	int estadoDFA;
+	int numSeq;
 
-	int tamTrama = 0;
-	tamTrama = lerSemAlarme(app.fileDescriptor, trama);
-	//verDados(trama, tamTrama);
+	contador = 0;
+	//limparFrame(TRAMA);
+	//tamTrama = leerSemAlarme(app.fileDescriptor, TRAMA);	
 	
-	unsigned char * auxx;
+	unsigned char Cs, Cr;
 
-	auxx = tramaI_toPacote(trama, tamTrama-1, &r);
+	do
+	{
+		tamTrama = 0;
+		numSeq = 0;
+
+		limparFrame(TRAMA);
+		tamTrama = leerSemAlarme(app.fileDescriptor, TRAMA);
+		//verDados(TRAMA, tamTrama);
+
+		//printf("bife\n");
+		//printf("%d\n", tamTrama);
+		//printf("0x%X\n", TRAMA [0]);
+		
+		Cs = TRAMA[2];
+		Cr = 0x00;
+		if (Cs == C_S_0)
+		{
+			Cr = C_RR_1;
+			numSeq = 0;
+		}
+		else if (Cs == C_S_1)
+		{
+			Cr = C_RR_0;
+			numSeq = 1;
+		}
+		
+		//TRAMA[1] = 0x45;
+		printf("0x%X 0x%X\n", A1, Cs);
+		estadoDFA = maquinaEstados(TRAMA, tamTrama-1, A1, Cs);
+		printf("Estado DFA llread(): %d\n", estadoDFA);
+		//printf("Estado dfa: %d\n", estadoDFA);
+		contador++;
+		//printf("Contador: %d\n", contador);
+	}
+
+	while(contador <= NUM_TRANSMITIONS && estadoDFA != 0);
+	//printf("aqui\n");
+	//verDados(TRAMA, tamTrama);
 	
-	copyPacote(auxx, buffer, r);
+	// acrescentado
 	
-	free(auxx);
+	
 
-	//printf("Endereco buffer: %d\n", &buffer[0]);
-	//verDados(buffer, r);
-
-	//printf("galinha\n");
-	unsigned char Cs = trama[2];
+	/*
+	unsigned char Cs = TRAMA[2];
 	unsigned char Cr = 0x00;
-	
-	int numSeq = 0;
-	
-	if (Cs == C_S_0) // Ns = 0
+	if (Cs == C_S_0)
 	{
 		Cr = C_RR_1;
-		numSeq = 0; // Nr = 1
+		numSeq = 0;
 	}
-	else if (Cs == C_S_1) // Ns = 1
+	else if (Cs == C_S_1)
 	{
 		Cr = C_RR_0;
-		numSeq = 1; // Nr = 0
+		numSeq = 1;
 	}
 	
-	//printf("Cs Cr: 0x%X 0x%X\n", Cs, Cr);
+
+	estadoDFA = maquinaEstados(TRAMA, tamTrama-1, A1, Cs);
+	*/
+
+	limparPacote(PACOTE);
+	tamPacote = iFrameToPackage(TRAMA, tamTrama-1, PACOTE);
 	
-	unsigned char * trama2 = tramaSU(app.status, 3, numSeq);
-	
+	limparFrame(TRAMA2);
+	tamTrama2 = suFrame(app.status, numSeq, 3, TRAMA2); //rr
 	//verDados(trama2, 4);
 	
-	int res = enviarSemAlarme(app.fileDescriptor, trama2, 5);
+	res = enviarrSemAlarme(app.fileDescriptor, TRAMA2, 5);
 	
 	//printf("Endereco buffer: %d\n", &buffer[0]);
 	
-	return(r);
+	return(tamPacote);
 }
 

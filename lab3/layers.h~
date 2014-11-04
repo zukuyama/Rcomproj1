@@ -56,4 +56,9 @@ void initLinkLayer(linkLayer * link)
 	strcpy(link->frame, "");
 }
 
+int llopen(int porta, size_t flag);
+int llwrite(int id, char * buffer, int length);
+int llread(int porta, size_t flag);
+int llclose(int porta, size_t flag);
+
 #endif
