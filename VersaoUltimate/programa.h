@@ -240,9 +240,9 @@ int iiDFA(unsigned char trama[MTS], int size, unsigned char Aesperado, unsigned 
 
 int maquinaEstados(unsigned char trama[MTS], int size, unsigned char Aesperado, unsigned char Cesperado)
 {
-	if (size < 5)
+	if (size < 4)
 	{
-		printf("Tamanho inferir a 5!\n");
+		printf("Tamanho inferior a 5!\n");
 		//tcflush(app.fileDescriptor, TCIOFLUSH);
 		return(-3);
 	}

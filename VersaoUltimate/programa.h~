@@ -424,7 +424,7 @@ int enviarTramaI(int fd, unsigned char frame[MTS], int size, int * rr_rej,
 	//printf("0x%X 0x%X\n", Aesperado, Cesperado);
 	int estadoDFA_RR = -2;
 	int estadoDFA_REJ = -2;
-
+	int estadoDFA =0;
 	numTramasI_re--;
    while ( contador < lnk.numTransmissions )
    {
