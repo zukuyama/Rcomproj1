@@ -131,7 +131,7 @@ int main(int argc, char ** argv)
 
 int funcaoIO()
 {
-	printf("\nINICIANDO TRANSMISSAO");
+	printf("\nINICIANDO TRANSMISSAO :: ");
 
 	if (app.status == TRANSMITTER)
 	{
@@ -190,7 +190,8 @@ int funcaoIO()
 						
 				i = 0;
 				linhaActual++;
-				printf("Linha %d\n", linhaActual);
+				//printf("Linha %d\n", linhaActual);
+				printf(" :: DADOS #%2.d :: ", linhaActual);
 				strcpy(string, "");
 			}
 			aux = fgetc(f);
@@ -265,7 +266,7 @@ int funcaoIO()
 		}
 		
 		//nomeFicheiro = "galinha.gif";
-		strcpy(nomeFicheiro, "galinha.gif");
+		//strcpy(nomeFicheiro, "galinha.gif");
 		
 		// armazenar a informacao
 		f = fopen(nomeFicheiro, "wb+");		
@@ -338,7 +339,7 @@ int funcaoIO()
 		unsigned int ttt = 0;
 
 		//nomeFicheiro = "pinguim.gif";
-		strcpy(nomeFicheiro, "pinguim.gif");
+		//strcpy(nomeFicheiro, "pinguim.gif");
 		
 		packageToControl(PACOTE, (tamFile), fff, &ttt);
 		
@@ -350,7 +351,9 @@ int funcaoIO()
 			printf("ERRO NO PACOTE DE CONTROLO DE FIM DE TRANSFERENCIA\n");
 			return(-1);
 		}
+		printf("SUCESSO , RECEPCAO DO PACOTE DE CONTROLO FINAL\n");
 	}
+
 }
 
 void estatistica()
@@ -370,12 +373,12 @@ void estatistica()
 	}
 	else
 	{	
-		strcpy(nomeFicheiro, "galinha.gif");
+		//strcpy(nomeFicheiro, "galinha.gif");
 		printf("NOME: %s\n", nomeFicheiro);
 		printf("TAMANHO ORIGINAL: %d\n", tamFicheiro);
 		printf("TAMANHO RECEBIDO: %d\n", tamTotal);
 		printf("TAMANHO CRIADO: %d\n", tamanhoFicheiro(nomeFicheiro));
-		strcpy(nomeFicheiro, "pinguim.gif");
+		//strcpy(nomeFicheiro, "pinguim.gif");
 		printf("nº TRAMAS I RECEBIDAS: %d\n", numTramasI_IO);
 		printf("nº TRAMAS I REJEITADAS: %d\n", numIO_REJ);
 		printf("nº TIMEOUTS: %d\n", numTimeouts);
