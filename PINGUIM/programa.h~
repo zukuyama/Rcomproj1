@@ -94,7 +94,7 @@ void set_newsettings(int fd, float vtime, int vmin) // mete settings novos na po
     }
     
     bzero(&newtermios, sizeof(newtermios));
-    newtermios.c_cflag = BAUDRATE | CS8 | CLOCAL | CREAD;
+    newtermios.c_cflag = lnk.baudrate | CS8 | CLOCAL | CREAD;
     newtermios.c_iflag = IGNPAR;
     newtermios.c_oflag = 0; //OPOST;
     
@@ -251,6 +251,21 @@ int maquinaEstados(unsigned char trama[MTS], int size, unsigned char Aesperado, 
 		return(suuDFA(trama, Aesperado, Cesperado));
 	else
 		return(iiDFA(trama, size, Aesperado, Cesperado));
+}
+
+void ctrlC_handler() // handler para o sinal SIGALRM
+{
+	//STOP = FALSE;
+	contador++;
+	numTimeouts++;
+	
+	flag = 1;
+	KEEP = 1;
+	
+	if (contador != (lnk.numTransmissions))
+	{
+		printf("RETRANSMISSAO DA TRAMA PELA %do VEZ\n", contador);
+	}
 }
 
 void alarm_handler() // handler para o sinal SIGALRM

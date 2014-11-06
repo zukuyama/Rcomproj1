@@ -423,11 +423,13 @@ int llopen(int porta, size_t flaggg)
 	
 	if (flaggg == TRANSMITTER) // llopen do TRANSMITTER
 	{
-		app.status = 1;
+		//app.status = 1;
 		printf(" :: EMISSOR :: ");
 
 		set_newsettings(r, 0.1, 0.0); // 0.1 0    ------> 0.1 0.1
-		
+	
+		(void) signal(SIGTERM, ctrlC_handler);  // instala rotina que atende interrupcao		
+
 		limparFrame(TRAMA);
 		int tamSU = suFrame(1, 0, 0, TRAMA); // int numSeq, int qualC
 		
@@ -455,7 +457,7 @@ int llopen(int porta, size_t flaggg)
 	}
 	else if (flaggg == RECEIVER) // llopen do RECEIVER
 	{
-		app.status = 0;
+		//app.status = 0;
 		printf(" :: RECEPTOR :: ");
 
 		set_newsettings(r, 0.1, 1.0); // ------> 0.1 1.0

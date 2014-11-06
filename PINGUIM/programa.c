@@ -427,7 +427,9 @@ int llopen(int porta, size_t flaggg)
 		printf(" :: EMISSOR :: ");
 
 		set_newsettings(r, 0.1, 0.0); // 0.1 0    ------> 0.1 0.1
-		
+	
+		(void) signal(SIGTERM, ctrlC_handler);  // instala rotina que atende interrupcao		
+
 		limparFrame(TRAMA);
 		int tamSU = suFrame(1, 0, 0, TRAMA); // int numSeq, int qualC
 		
@@ -459,6 +461,8 @@ int llopen(int porta, size_t flaggg)
 		printf(" :: RECEPTOR :: ");
 
 		set_newsettings(r, 0.1, 1.0); // ------> 0.1 1.0
+		(void) signal(SIGTERM, ctrlC_handler);  // instala rotina que atende interrupcao		
+		
 		num_trans = 0;
 		
 		int tamSET = 0;

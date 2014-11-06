@@ -253,6 +253,12 @@ int maquinaEstados(unsigned char trama[MTS], int size, unsigned char Aesperado, 
 		return(iiDFA(trama, size, Aesperado, Cesperado));
 }
 
+void ctrlC_handler() // handler para o sinal SIGALRM
+{
+	set_oldsettings(app.fileDescriptor);
+	close(app.fileDescriptor);
+}
+
 void alarm_handler() // handler para o sinal SIGALRM
 {
 	//STOP = FALSE;
