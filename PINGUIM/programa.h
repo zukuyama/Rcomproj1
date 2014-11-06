@@ -255,8 +255,10 @@ int maquinaEstados(unsigned char trama[MTS], int size, unsigned char Aesperado, 
 
 void ctrlC_handler() // handler para o sinal SIGALRM
 {
+	printf("\nCTRL C ACTIVADO\n");
 	set_oldsettings(app.fileDescriptor);
 	close(app.fileDescriptor);
+	exit(1);
 }
 
 void alarm_handler() // handler para o sinal SIGALRM

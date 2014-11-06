@@ -112,11 +112,11 @@ int main(int argc, char ** argv)
 	{
 		printf(" :: LIGADO COM SUCESSO\n");
 	}	
-	
+	(void) signal(SIGINT, ctrlC_handler);  // instala rotina que atende interrupcao	
+
 	/****************************************
 				TRATAMENTO DE DADOS
 	*****************************************/
-	//return(0);
 	if (funcaoIO() < 0) return(-1);
 		
 	/****************************************
@@ -265,10 +265,8 @@ int funcaoIO()
 		//printf("Nome ficheiro: %s\n", nomeFicheiro);
 		//printf("Tamanho do ficheiro: %d\n", tamFicheiro);
 		
-		if (tamanhoFicheiro(nomeFicheiro) == -1)
-		{
-			printf("FICHEIRO %s NAO EXISTE\n", nomeFicheiro);
-		}
+		//if (tamanhoFicheiro(nomeFicheiro) == -1) printf("FICHEIRO %s NAO EXISTE\n", nomeFicheiro);
+		
 		
 		//nomeFicheiro = "galinha.gif";
 		//strcpy(nomeFicheiro, "galinha.gif");
@@ -423,12 +421,11 @@ int llopen(int porta, size_t flaggg)
 	
 	if (flaggg == TRANSMITTER) // llopen do TRANSMITTER
 	{
+		sleep(1);
 		//app.status = 1;
 		printf(" :: EMISSOR :: ");
 
-		set_newsettings(r, 0.1, 0.0); // 0.1 0    ------> 0.1 0.1
-	
-		(void) signal(SIGTERM, ctrlC_handler);  // instala rotina que atende interrupcao		
+		set_newsettings(r, 0.1, 0.0); // 0.1 0 	
 
 		limparFrame(TRAMA);
 		int tamSU = suFrame(1, 0, 0, TRAMA); // int numSeq, int qualC
@@ -460,8 +457,7 @@ int llopen(int porta, size_t flaggg)
 		//app.status = 0;
 		printf(" :: RECEPTOR :: ");
 
-		set_newsettings(r, 0.1, 1.0); // ------> 0.1 1.0
-		(void) signal(SIGTERM, ctrlC_handler);  // instala rotina que atende interrupcao		
+		set_newsettings(r, 0.1, 1.0); // ------> 0.1 1.0	
 		
 		num_trans = 0;
 		
