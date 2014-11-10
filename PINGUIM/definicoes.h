@@ -41,8 +41,8 @@
 #define C_REJ_0 0x01
 #define C_REJ_1 0x81
 
-#define MFS 256
-#define MTS 600
+#define MFS 500
+#define MTS 1010
 
 #define Cpkg_dados 0x01
 #define Cpkg_inicio 0x02
@@ -423,6 +423,7 @@ int iFrame(unsigned char pkg[MTS], int size, unsigned char frame[MTS])
 	frame[b] = xoor(frame, 4, b - 1); //xor(pkg, 0, (size));
 	//printf("RESULTDO DO XOR: 0x%X\n", frame[b]);
 	b++;
+
 	frame[b] = FLAG;
 	b++;
 
@@ -586,6 +587,8 @@ int controlToPackage( char * nomeFicheiro, int tamFicheiro, int modo, unsigned c
 		pkg[i] = s[j];
 		i++;
 	}
+
+	//pkg[i - 3] = 0x00;
 
 	pkg[i] = 0x01; // nome do ficheiro
 	i++;
