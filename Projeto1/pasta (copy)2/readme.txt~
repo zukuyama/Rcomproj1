@@ -1,0 +1,19 @@
+para executar:
+---------------------------
+on: ttyS4
+
+run terminal
+  make
+  -if sending 
+    $ bin/main client send
+  -if receiving
+      $ bin/main client get
+
+on: ttyS0
+
+run terminal
+  make
+  -if sending 
+    $ bin/main server send
+  -if receiving
+    $ bin/main server get
