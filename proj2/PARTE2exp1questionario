@@ -49,13 +49,13 @@ E no header do Ip(protocol):
 ...................length interpretation:
 
 Analisando o header na 3ª posicao , depois do destino e origen do MAC adress
-existem 2 bytes reservados para a indicação do comprimento do drame
+existem 2 bytes reservados para a indicação do comprimento do frame
 
 ##################################################################
 #######7.What is the loopback interface and why is it important?##
 ##################################################################
-O tráfego enviado por um computador  é reendereçado para o mesmo computador(loop)
-Serve como mecanismo de teste da transmissão ou do transporte da mesma
+O tráfego enviado por um computador  é reendereçado para o mesmo computador(loop).
+Esta interface é importante pois serve como mecanismo de teste da transmissão ou do transporte da mesma.
 
 1ª
 Para activar a loopback interface:
