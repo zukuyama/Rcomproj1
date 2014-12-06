@@ -31,10 +31,6 @@
 
 #######################################################################
 ###How many broadcast domains are there? How can you conclude it from##
-There are 2 broadcast domains : 172.16.60.0 and 172.16.61.0
-
-we know that each VLAN creates its own broadcast domain in 1 or more physical switches.By checking the logs we can conclude that those 2 are the ones that use the ICMP(internet control message Protocol)
-#####################################
-###(ver melhor esta ultima depois.###
-#####################################
-
+the logs?
+###################################################################
+falta fazer a experiencia

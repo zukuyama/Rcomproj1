@@ -1,0 +1,77 @@
+##################################################################
+###What routes are there in the tuxes? What are their meaning?####
+##################################################################	
+ 			Tux1
+	Destination  Gateway Genmask Flags Metric Ref Use Iface
+	172.16.50.0	|0.0.0.0	 |(24)  |U	|	0	|	0 |	0	|eth0	
+	172.16.51.0	|172.16.50.254|(24) | U6 |0|  0 |   0  |eth0
+
+		Tux2
+	172.16.50.0 |172.16.51.253|(24) |U6 |0|0|0|eth0
+	172.16.51.0 |0.0.0.0      | (24)|U  |0|0|0|eth0
+
+		tux4
+	172.16.50.0 |0.0.0.0|(24)| U| 0 |0|0|eth0
+	172.16.51.0 |0.0.0.0|(24)|U | 0 |0|0|etho1
+
+
+###################################################################
+##What information does an entry of the forwarding table contain?##
+###################################################################
+
+
+The forwarding table also known as forwarding information base (FIB) has the IP network IDs to which the node belong.
+The forwarding table is used to recognize IP-packets destinated for hosts that are attached to the same network as the host itself. 
+
+###################################################################
+#What ARP messages,and associated MAC addresses,are observed andwhy?#####################################################################
+
+nº1(request):
+Hardware type: Ethernet (1)
+Protocol type: IP(0x0800)
+Hardware size: 6
+Protocol size:4
+Opcode: request (1)
+[Us gratuitous: False]
+Sender MAC address: G-ProCOm_8c:af:71 (00:0f:fe:8c:af:71)
+Sender IP address: 172.16.60.1(172.16.60.1)
+Target MAC address: 00:00:00_00:00:00 (00:00:00:00:00:00)
+Target IP address: 172.16.60.254 (172,16,60.254)
+
+nº1(reply):
+Hardware type: Ethernet (1)
+Protocol type: IP(0x0800)
+Hardware size: 6
+Protocol size:4
+Opcode: reply (2)
+[Us gratuitous: False]
+Sender MAC address: Hewlett-_c5:61:bb (00:21:5a:c5:61:bb)
+Sender IP address: 172.16.60.254 (172.16.60.254)
+Target MAC address: G-ProCom_8c:af:71 (00:0f:fe:8c:af:71)
+Target IP address: 172.16.60.1(172.16.60.1)
+
+nº2(request):
+Hardware type: Ethernet (1)
+Protocol type: IP (0x0800)
+Hardware size: 6
+Protocol size: 4
+Opcode: request(1)
+[Is gratuitous: False]
+Sender Mac address: Hewlett-_c5:61:bb (00:21:5a:c5:61:bb)
+Sender IP address: 172.16.60.254 (172.16.60.254)
+Target Mac address: 00:00:00_00:00:00 (00:00:00:00:00:00)
+Target IP address: 172.16.60.1(172.16.60.1)
+
+nº2(reply)
+Hardware type: Ethernet (1)
+Protocol type: IP (0x0800)
+Hardware size: 6
+Protocol size: 4
+Opcode: reply(2)
+[Is gratuitous: False]
+Sender Mac address: G-ProCOm_8c:af:71 (00:0f:fe:8c:af:71)
+Sender IP address: 172.16.60.1 (172.16.60.1)
+Target Mac address: Hewlett-_c5:61:bb (00:21:5a:c5:61:bb)
+Target IP address: 172.16.60.254(172.16.60.254)
+
+
