@@ -1,0 +1,36 @@
+#################################
+#####How to configure vlany0?#####
+#################################
+1- Creating an Ethernet VLAN
+» configure terminal
+» vlan 50
+» end
+» show vlan id 50
+
+» configure terminal
+» vlan 51
+» end
+» show vlan id 51
+
+2-Add port x to vlan x0
+» configure terminal
+» interface fastethernet 0/1
+» switchport mode access
+» switchport access vlan 50
+» end
+» show running-config interface fastethernet 0/1
+» show interfaces fastethernet 0/1 switchport
+
+» configure terminal
+» interface fastethernet 0/3
+» switchport mode access
+» switchport access vlan 51
+» end
+» show running-config interface fastethernet 0/3
+» show interfaces fastethernet 0/3 switchport
+
+#######################################################################
+###How many broadcast domains are there? How can you conclude it from##
+the logs?
+###################################################################
+falta fazer a experiencia
