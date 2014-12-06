@@ -74,4 +74,80 @@ Sender IP address: 172.16.60.1 (172.16.60.1)
 Target Mac address: Hewlett-_c5:61:bb (00:21:5a:c5:61:bb)
 Target IP address: 172.16.60.254(172.16.60.254)
 
+###explicar o porquê destas mensagens####
+
+############################################################
+########What ICMP packets are observed and why?#############
+############################################################
+Type: 8 (Echo (ping) request)
+Code: 0
+Checksum: 0x1a23 [correct]
+Identifier (BE): 9288 (0x2448)
+Identifier (LE): 18468 (0x4824)
+Sequence number (BE): 1 (0x0001)
+Sequence number (LE): 256 (0x0100)
+Response In: 10
+
+Type: 0 (Echo (ping) reply)
+Code: 0
+Checksum: 0x2223 [correct]
+Identifier (BE): 9288 (0x2448)
+Identifier (LE): 18468 (0x4824)
+Sequence number (BE): 1 (0x0001)
+Sequence number (LE): 256 (0x0100)
+Sequence number (LE): 256 (0x0100)
+Response To: 9
+
+Type: 8 (Echo (ping) request)
+Code: 0
+Checksum: 0x0026 [correct]
+Identifier (BE): 9288 (0x2448)
+Identifier (LE): 18468 (0x4824)
+Sequence number (BE): 2 (0x0002)
+Sequence number (LE): 512 (0x0200)
+Response In: 12
+
+Type: 0 (Echo (ping) reply)
+Code: 0
+Checksum: 0x0826 [correct]
+Identifier (BE): 9288 (0x2448)
+Identifier (LE): 18468 (0x4824)
+Sequence number (BE): 2 (0x0002)
+Sequence number (LE): 512 (0x0200)
+Response To: 11
+
+###explicar o porquê destas mensagens####
+
+#######################################################################
+#What are the IP and MAC addresses associated to ICMP packets and# #why?#############################################################
+##################################################################
+Destination: 
+Hewlett-_c5:61:bb (00:21:5a:c5:61:bb)
+Address: Hewlett-_c5:61:bb (00:21:5a:c5:61:bb)
+Source: 
+G-ProCom_8c:af:71 (00:0f:fe:8c:af:71)
+Address: G-ProCom_8c:af:71 (00:0f:fe:8c:af:71)
+
+Destination: 
+G-ProCom_8c:af:71 (00:0f:fe:8c:af:71)
+Address: G-ProCom_8c:af:71 (00:0f:fe:8c:af:71)
+Source: 
+Hewlett-_c5:61:bb (00:21:5a:c5:61:bb)
+Address: Hewlett-_c5:61:bb (00:21:5a:c5:61:bb)
+
+Destination:
+ Hewlett-_c5:61:bb (00:21:5a:c5:61:bb)
+Address: Hewlett-_c5:61:bb (00:21:5a:c5:61:bb)
+Source:
+ G-ProCom_8c:af:71 (00:0f:fe:8c:af:71)
+Address: G-ProCom_8c:af:71 (00:0f:fe:8c:af:71)
+
+Destination: 
+G-ProCom_8c:af:71 (00:0f:fe:8c:af:71)
+Address: G-ProCom_8c:af:71 (00:0f:fe:8c:af:71)
+Source: 
+Hewlett-_c5:61:bb (00:21:5a:c5:61:bb)
+Address: Hewlett-_c5:61:bb (00:21:5a:c5:61:bb)
+
+###explicar o porquê destas mensagens####
 

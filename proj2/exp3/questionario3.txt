@@ -151,3 +151,5 @@ Address: Hewlett-_c5:61:bb (00:21:5a:c5:61:bb)
 
 ###explicar o porquê destas mensagens####
 
+
+

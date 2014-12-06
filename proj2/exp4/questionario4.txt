@@ -1,0 +1,62 @@
+############################################################# 
+##How to configure a static route in a commercial router?####
+#############################################################
+ip route prefix mask {ip-address | interface-type interface-number [ip-address]}
+
+#################################################################
+##What are the paths followed by the packets in the experiments## ##carried out and why?###########################################
+#################################################################
+
+(ver se esta bem)
+tux1:
+traceroute 172.16.51.1 (del)
+	
+	1.  172.16.50.254(172.16.50.254)   0.262ms  0.236   0.219ms
+	2.  * * * (perguntar ao prof o que significa isto)
+	3.  172.16.51.1(172.16.51.1) 1.044ms 1.017ms
+
+traceroute 172.16.51.1 (add)
+
+	1.	  172.16.50.254(172.16.50.254) 0.395ms 0.371ms	0.356ms
+	2.	  172.16.51.1(172.16.51.1)  0.549ms  0.538ms		0.525ms
+
+##############################################################
+######How to configure NAT in a commercial router?############
+##############################################################
+Open router console , and do the following:
+	1.configure terminal
+	2.interface gigabitethernet 0/0
+	3.ip address 172.16.51.254  255.255.255.0
+	4.no shutdown
+	5. ip nat inside
+	6.end
+
+	7.configure terminal
+	8.interface gigabitethernet 0/1
+	9.ip address 172.16.1.59  255.255.255.0
+	10.no shutdown
+	11.ip nat outside
+	12.end
+	
+	13.configure terminal
+	14.ip nat pool ovrld 172.16.1.19 172.16.1.19 prefix 24
+	15.ip nat inside source list 1 pool ovrld overload
+	16.end
+
+#############################################################
+##########What does NAT do?##################################
+#############################################################
+(ver se está bem, e reescrever )
+
+Its the translation of an Internet Protocol address (IP address) used within one network to a different IP address known within another network. One network is designated the inside network and the other is the outside. 
+Works by assigning a  public address to a computer (or group of computers) inside a private network. The main use of NAT is to limit the number of public IP addresses an organization or company must use, for both economy and security purposes.
+
+###############################################################
+
+
+
+
+
+
+
+nat 
