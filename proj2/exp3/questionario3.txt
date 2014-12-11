@@ -23,8 +23,9 @@
 The forwarding table also known as forwarding information base (FIB) has the IP network IDs to which the node belong.
 The forwarding table is used to recognize IP-packets destinated for hosts that are attached to the same network as the host itself. 
 
-###################################################################
-#What ARP messages,and associated MAC addresses,are observed andwhy?#####################################################################
+##############################################################################
+#####What ARP messages,and associated MAC addresses,are observed andwhy?########
+#################################################################################
 
 nº1(request):
 Hardware type: Ethernet (1)

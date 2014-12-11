@@ -3,12 +3,11 @@
 #####################################################
 (ver se está bem)
 
-Para cada computador,editar/acrescentar ao ficheiro:
+For each computer,edit/add to the file:
 /etc/resolv.conf
 
-		1. search netlab.fe.up.pt
-		2.nameserver 172.16.1.2
-
+	1. search netlab.fe.up.pt
+	2.nameserver 172.16.1.2
 
 
 #############################################################
