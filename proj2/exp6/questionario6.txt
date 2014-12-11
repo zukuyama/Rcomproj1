@@ -1,0 +1,48 @@
+##############################################################
+##How many TCP connections are opened by your ftp application###
+#################################################################
+2. Control and datagram
+
+
+
+#################################################################
+in what connection is transported the FTP control information##
+###########################
+
+
+falta
+
+
+###############################################
+What are the phases of the TCP CONNECTION
+##################################################
+ 3. Connection establishment phase, data transfer phase and termination phase
+ 
+ 
+ 
+ #################################################################################
+ ###How does the ARQ TCP mechanism work? What are the revevant TCP fields? #######
+ ##what relevant information can be observed in the logs##########################
+ #######################################
+ 
+ falta
+ 
+ 
+ ###########################
+ ##how does the TCP congestion control mechanism work ? ##
+ what are the relevant fields. ##
+ How did the throughtput of the data connection evolve along the time? ##
+ Is it accordint the TCP congestion control mechanism?##
+ #########################
+ 
+ falta
+ 
+ 
+ ########################
+ ##Is the throughtput of a TCP data connection disturbed## 
+ ###by the appearance of a second TCP connection? How?##
+ #################
+ 
+ falta
+ 
+ 
