@@ -48,15 +48,12 @@ Open router console , and do the following:
 #############################################################
 (ver se está bem, e reescrever )
 
-Its the translation of an Internet Protocol address (IP address) used within one network to a different IP address known within another network. One network is designated the inside network and the other is the outside. 
-Works by assigning a  public address to a computer (or group of computers) inside a private network. The main use of NAT is to limit the number of public IP addresses an organization or company must use, for both economy and security purposes.
+Its the translation of an Internet Protocol address (IP address) 
+used within one network to a different IP address known within another network. 
+One network is designated the inside network and the other is the outside. 
+Works by assigning a  public address to a computer (or group of computers) inside a private network.
+ The main use of NAT is to limit the number of public IP addresses an organization or company must use, for both economy and security purposes.
 
 ###############################################################
 
 
-
-
-
-
-
-nat 
