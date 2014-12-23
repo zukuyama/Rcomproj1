@@ -90,35 +90,35 @@ int main(int argc, char** argv)
 	printf("Host name  : %s\n", h->h_name);
 	printf("IP Address : %s\n", SERVER_ADDR);
 
-	//server address handling
+	//manipulacao de endereco do servidor
 	bzero((char*)&server_addr,sizeof(server_addr));
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_addr.s_addr = inet_addr(SERVER_ADDR);	//32 bit Internet address network byte ordered
 	server_addr.sin_port = htons(SERVER_PORT);		//server TCP port must be network byte ordered
 
-	//open an TCP socket
+	//abertura do socket TCP para a ligacao de controlo
 	sockfd = socket(AF_INET,SOCK_STREAM,0);
 	if (sockfd < 0)
 	{
 		msgErro("socket()");
 	}
-	//connect to the server
-
+	
 	msg("\n[Programa] ~ Pedido de conexao enviado");
 	
+	//ligacao ao servidor 
 	if(connect(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
 	{
 		msgErro("connect()");
 	}
 
-    //receive response to connect
+    	//resposta do servidor
 	memset(response, 0, 256);
 	bytes = read(sockfd, response, 50);
 	
 	printf("[Servidor] < %s\n", response);
 	
-	//send user
-	
+	/* login no servidor*/
+	// enviar username
 	strcpy(userSend, "user ");
 	strcat(userSend, user);
 	strcat(userSend, "\n");
@@ -130,13 +130,13 @@ int main(int argc, char** argv)
 		msgErro("ftp.c: line 124");
 	}
 
-    //receive response to user
+    	//resposta do servidor
 	memset(response, 0, 256);
 	bytes = read(sockfd, response, 50);
 	printf("[Servidor] < %s\n", response);
+		
 			
-	//send pass
-	
+	//enviar password
 	strcpy(passSend, "pass ");
 	strcat(passSend, pass);
 	strcat(passSend, "\n");
@@ -148,7 +148,7 @@ int main(int argc, char** argv)
 		exit(0);
 	}
 	
-	//receive response to pass
+	// resposta do servidor
 	memset(response, 0, 256);
 	bytes = read(sockfd, response, 50);
 	printf("[Servidor] < %s\n", response);
@@ -158,7 +158,7 @@ int main(int argc, char** argv)
 		msgErro("Palavra-chave errada");
 	}
 	
-	//send pasv
+	//enviar comando pasv
 	strcpy(pasvSend, "pasv");
 	strcat(pasvSend, "\n");
 	printf("[Comando]  > %s", pasvSend);
@@ -170,7 +170,7 @@ int main(int argc, char** argv)
 	}
 
 
-    //receive response to pasv
+    	//resposta do servidor com o novo ip e a porta de ligacao
 	memset(response, 0, 256);
 	bytes = read(sockfd, response, 50);
 	printf("[Servidor] < %s\n", response);
@@ -181,7 +181,7 @@ int main(int argc, char** argv)
 		perror("pasv");
 	}
 
-	//parse do novo IP
+	//conversao do novo ip e da porta de ligacao ao servidor
 	port = pasv5*256 + pasv6;
 	memset(ip, 0, 256),
 	sprintf(ip, "%d.%d.%d.%d", pasv1, pasv2, pasv3, pasv4);
@@ -201,7 +201,7 @@ int main(int argc, char** argv)
 	printf("Host name  : %s\n", h2->h_name);
 	printf("IP Address : %s\n\n", SERVER_ADDR);
 
-	//server address handling
+	//manipulacao de endereco do servidor
 	bzero((char*)&server_addr2,sizeof(server_addr2));
 	server_addr2.sin_family = AF_INET;
 	server_addr2.sin_addr.s_addr = inet_addr(SERVER_ADDR);	//32 bit Internet address network byte ordered
@@ -211,21 +211,22 @@ int main(int argc, char** argv)
 	msg("		Socket 2");
 	msg("-----------------------------------");
 
-	//open an TCP socket
+	//abertura de um segundo socket TCP para ligacao de dados
 	sockfd2 = socket(AF_INET,SOCK_STREAM,0);
 	if (sockfd2 < 0)
 	{
 		perror("socket()");
 		exit(0);
 	}
-	//connect to the server
+	
+	//ligacao ao servidor 
 	if(connect(sockfd2, (struct sockaddr *)&server_addr2, sizeof(server_addr2)) < 0)
 	{
 		perror("connect()");
 		exit(0);
 	}
 
-	//send retrieve of File to socket 1
+	//enviar o comando de retorno de um ficheiro para o socket de controlo
 	strcpy(retrSend, "retr ");
 	strcat(retrSend, path);
 	strcat(retrSend, "\n");
@@ -236,7 +237,7 @@ int main(int argc, char** argv)
 		msgErro("ftp.c : line 226");
 	}
 
-	//receive response to pass
+	// resposta do servidor
 	memset(response, 0, 256);
 	bytes = read(sockfd, response, 50);
 	printf("[Servidor] < %s\n", response);
@@ -246,7 +247,7 @@ int main(int argc, char** argv)
 		exit(1);
 	}
 	
-	//receive response to retr
+	// recepcao ficheiro
 	i = strlen(path)-1;
 	j = 0;
 	while(i > 0)
