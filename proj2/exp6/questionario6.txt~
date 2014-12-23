@@ -1,21 +1,22 @@
 ##############################################################
 ##How many TCP connections are opened by your ftp application###
 #################################################################
-duas a conexao de controlo e a conexao de dados
+2. Control and datagram
 
 
 
 #################################################################
-in what connection is transported the FTP control information  ##
-################################################################
-na primeira conexao ou seja na conexao de controlo
+in what connection is transported the FTP control information##
+###########################
+
+
+falta
 
 
 ###############################################
 What are the phases of the TCP CONNECTION
 ##################################################
- 3 estabelecimento da conexão, troca de
-dados e encerramento da conexão.
+ 3. Connection establishment phase, data transfer phase and termination phase
  
  
  
@@ -23,7 +24,8 @@ dados e encerramento da conexão.
  ###How does the ARQ TCP mechanism work? What are the revevant TCP fields? #######
  ##what relevant information can be observed in the logs##########################
  #######################################
-TCP, provide end-to-end reliable communication,  automatic repeat request (ARQ) protocol. The ARQ protocol also provides flow control, which may be combined with congestion avoidance.
+ 
+ falta
  
  
  ###########################
