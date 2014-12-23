@@ -23,32 +23,41 @@ dados e encerramento da conexão.
  ###How does the ARQ TCP mechanism work? What are the revevant TCP fields? #######
  ##what relevant information can be observed in the logs##########################
  #######################################
-TCP, provide end-to-end reliable communication,  automatic repeat request (ARQ) protocol. The ARQ protocol also provides flow control, which may be combined with congestion avoidance.
+ How does the ARQ TCP mechanism work?
+R1:( funciona como o primeiro trabalho, no entanto pode funcionar sobre outros modelos estudados nas teorias)
+o ARQ TCP inicia a ligação através de um socket
+e envia datagrams (pacotes de dados)
+mediante um timeout ou falha de envio(através de uma resposta) o pacote é reenviado
+o ARQ TCP pode operar sobre os seguintes modelos: Stop-and-wait, Go-Back-N, Selective Repeat
+
+ What are the revevant TCP fields?
+ R2:source port, destination port, sequence number, acknowledgement number, 
+ data offset, reserved, control bits(flags),
+ window size, checksum, urgent pointer, padding.
  
- 
+ what relevant information can be observed in the logs
+ R3:dos logs de uma ligação ARQ TCP sabes a cada instancia se 
+ foi transferido um pacote com sucesso ou não ( controlo/datagram)
  ###########################
  ##how does the TCP congestion control mechanism work ? ##
  what are the relevant fields. ##
  How did the throughtput of the data connection evolve along the time? ##
  Is it accordint the TCP congestion control mechanism?##
  #########################
-O TCP usa vários mecanismos para melhor a performance e evitar o colapso por congestionamento.
+ R1:
+O TCP usa vários mecanismos para melhorar a performance e evitar o colapso por congestionamento.
 Tais mecanismos mantêm a "data flow" em niveis aceitáveis.
-
-(ver se dá para aproveitar algo em baixo)
-Acknowledgments for data sent, or lack of acknowledgments,
- are used by senders to infer network conditions between 
- the TCP sender and receiver. Coupled with timers,
- TCP senders and receivers can alter the behavior of the flow of data.
- This is more generally referred to as congestion control and/or network congestion
- avoidance.
+O conhecimento da informação enviada ou a falta dele, é usanda para aferir do estado da
+condição da rede entre o TCP que envia e o que recebe, adequando assim o comportamento
+da "flow" de data.
 
  
  ########################
  ##Is the throughtput of a TCP data connection disturbed## 
  ###by the appearance of a second TCP connection? How?##
  #################
- 
- falta
+Sim porque a abertura de uma segunda ligação afecta directamente o 
+tempo de resposta entre uma ligação existente.Se as duas ligações estiverem a tentar enviar/responder
+ ao mesmo tempo então teremos uma resolução de envio por divisão de tempo despendido por ambas as ligações.
  
  
