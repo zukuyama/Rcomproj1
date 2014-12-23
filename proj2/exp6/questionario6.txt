@@ -32,9 +32,17 @@ TCP, provide end-to-end reliable communication,  automatic repeat request (ARQ) 
  How did the throughtput of the data connection evolve along the time? ##
  Is it accordint the TCP congestion control mechanism?##
  #########################
- 
- falta
- 
+O TCP usa vários mecanismos para melhor a performance e evitar o colapso por congestionamento.
+Tais mecanismos mantêm a "data flow" em niveis aceitáveis.
+
+(ver se dá para aproveitar algo em baixo)
+Acknowledgments for data sent, or lack of acknowledgments,
+ are used by senders to infer network conditions between 
+ the TCP sender and receiver. Coupled with timers,
+ TCP senders and receivers can alter the behavior of the flow of data.
+ This is more generally referred to as congestion control and/or network congestion
+ avoidance.
+
  
  ########################
  ##Is the throughtput of a TCP data connection disturbed## 
